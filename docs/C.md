@@ -3,15 +3,17 @@
 2.	C语言没有内置数据结构，必须自己创建。
 3.	使用栈的时候不用担心清理其中的变量，因为这个过程是自动的。但是一旦申请堆上的空间，这块空间就不再被分配出去。存储器泄露是C程序中最常见的错误且难以追踪。
 4.	valgrind通过拦截malloc()和free()检查存储器泄露问题。在valgrind.org上查看最新发行版的详细信息。
-5.	指针是存储器中某条数据的地址。使用指针可以避免副本并且共享数据。使用“&变量名”找出变量的存储器地址。*运算符与&运算符正好相反，它接收一个地址，返回地址中保存的数据。也被描述成对指针进行解引用。*运算符还可以设置存储器地址中的内容。
+5.	指针是存储器中某条数据的地址。使用指针可以避免副本并且共享数据。使用“&变量名”找出变量的存储器地址。\*运算符与&运算符正好相反，它接收一个地址，返回地址中保存的数据。也被描述成对指针进行解引用。*运算符还可以设置存储器地址中的内容。
 6.	对每种类型的数据，指针变量都有不同的类型。如果对char指针加1，指针会指向存储器中下一个地址，因为char只占1字节。如果对int指针加1，代码会对存储器地址加4，因为int占4字节。
 7.	C语言不支持现成的字符串。但有很多扩展库提供字符串。字符串以数组的形式储存，定义的时候长度为n+1，因为字符串末尾需要有一个结束字符‘\0’。计算机会为字符串的每一个字符以及结束字符在栈上分配空间，并把首字符的地址和变量关联起来。
-8.	一个数组变量就好比一个指针。所以在使用sizeof()运算符（不是一个函数，运算符在编译时就被分配了空间）的时候会返回奇怪的结果——只返回字符串指针的大小。我们定义一个数组d: d[0]与*d等价。
-9.	如果是普通的变量声明，char d\[ \] = “dump”; 就是一个数组。但如果是以函数参数的形式声明，那么d就是一个char指针，例如void test(char d[ ])。
-10.	指向字符串字面值的指针变量不能用来修改字符串内容，例如char \*d = “dump”; 不能用这个变量修改这个字符串。但如果用字符串字面值创建一个数组，例如char d[ ] = “dump”; 就可以修改。如果我们想把指针设成字符串字面值，必须确保使用了const关键字。若是编译器发现有代码试图修改字符串，就会提示编译错误。
+8.	一个数组变量就好比一个指针。所以在使用sizeof()运算符（不是一个函数，运算符在编译时就被分配了空间）的时候会返回奇怪的结果——只返回字符串指针的大小。我们定义一个数组d: d\[0\]与\*d等价。
+9.	如果是普通的变量声明，char d\[ \] = “dump”; 就是一个数组。但如果是以函数参数的形式声明，那么d就是一个char指针，例如void test(char d\[ \])。
+10.	指向字符串字面值的指针变量不能用来修改字符串内容，例如char \*d = “dump”; 不能用这个变量修改这个字符串。但如果用字符串字面值创建一个数组，例如char d\[ \] = “dump”; 就可以修改。如果我们想把指针设成字符串字面值，必须确保使用了const关键字。若是编译器发现有代码试图修改字符串，就会提示编译错误。
 11.	但是数组变量与指针不完全相同。参考以下代码：
+```
 char s\[ \] = “How big is it?”;
-char *t = s;
+char \*t = s;
+```
 sizeof(s)会返回15，sizeof(t)会返回4或者8（取决于操作系统）。
 数组变量不能指向其他地方。当创建指针变量时，计算机会为他分配存储空间。计算机会为数组分配存储空间，但是不会为**数组变量**分配任何空间，编译器会在出现它的地方把它替换成数组的起始地址。如此例中，s=t会报编译错误。
 12.	指针退化：把数组赋值给指针变量，指针变量只会包含数组的地址信息，不包含数组长度。只要把数组传递给函数，数组免不了退化为指针，所以需要记清楚代码中发生过数组退化的地方，以避免引发不易察觉的错误。
@@ -28,21 +30,21 @@ sizeof(s)会返回15，sizeof(t)会返回4或者8（取决于操作系统）。
 22.	用结构创建结构化数据类型（把一批数据打包成一样东西）。struct是structured data type的缩写。可以按名访问结构字段（f1.name）。当把一个结构变量赋值给另一个时，只会复制结构的内容。
 示例：
 ```
-	struct fish {
-		const char *name; // 保存不想修改的字符串
-		const char *species;
-		int age;
-	}
-	struct fish f1 = {“fish1”, “big”, 4};
+struct fish {
+	const char *name; // 保存不想修改的字符串
+	const char *species;
+	int age;
+}
+struct fish f1 = {“fish1”, “big”, 4};
 ```
 23.	可以用typedef为结构命名。创建别名后可以不需要结构名。但是在递归结构中，需要包含一个相同类型的指针，因此必须为结构起一个名字。
 示例：
 ```
-	typedef struct fish {
-		const char *name; // 保存不想修改的字符串
-		const char *species;
-		int age;
-	} ff; // ff将成为struct fish的别名
+typedef struct fish {
+	const char *name; // 保存不想修改的字符串
+	const char *species;
+	int age;
+} ff; // ff将成为struct fish的别名
 ff f1 = {“fish1”, “big”, 4};
 ```
 24.	“指针->字段”相当于“(*指针).字段”。
@@ -50,10 +52,12 @@ ff f1 = {“fish1”, “big”, 4};
 
 # 命令行操作：
 1.	可以用<重定向标准输入，用>重定向标准输出，用2>重定向标准错误。
-示例：program < data.csv > output.json
+示例：
+```program < data.csv > output.json```
 2.	Windows的命令提示符中输入echo %ERRORLEVEL% 可以在重定向输出的同时显示错误消息。
 3.	两个独立的程序用管道连接以后就可以看成一个程序。
-示例：(program1 | program2) < data.csv > output.json
+示例：
+```(program1 | program2) < data.csv > output.json```
 4.	make编译的文件叫目标。对于每个目标，需要知道它的依赖项和生成方法（合在一起构成一条规则）。生成方法必须以tab开头。
 示例：//将make规则保存在当前目录下一个叫Makefile的文本文件中
 ```
@@ -65,25 +69,27 @@ launch: launch.o thruster.o
 	gcc launch.o thruster.o -o launch
 ```
 //在控制台输入以下指令
+```
 > make launch
 gcc -c launch.c
 gcc -c thruster.c
 gcc launch.o thruster.o -o launch
+```
 5.	在多个C项目中共享头文件的方法：把头文件保存在标准目录中（/usr/local/include）；在include语句中使用完整路径名；告诉编译器去哪里找头文件（gcc后跟-I选项）。
 6.	存档命令（ar）会在存档文件中保存一批目标文件。
-示例：ar -rcs libsecurity.a f1.o f2.o
+示例：
+```> ar -rcs libsecurity.a f1.o f2.o  ```
 r表示如果.a文件存在就更新它，c表示不反馈信息，s告诉哦ar要在.a文件开头建立索引。后面是保存在存档中的文件。
 所有.a文件名都是libXXX.a的形式。这是命名静态库的标准方式。
 7.	当存档安装在标准目录，可以使用-l编译代码。
-示例：gcc  test.c -lsecurity -o test
+示例：```gcc  test.c -lsecurity -o test```
 //security叫编译器去找libsecurity.a的存档
 //可以设置多个-l选项来使用多个存档
-
 当存档安装在其他目录，可以用-L编译代码。
-示例：gcc  test.c -L/myLib -lsecurity -o test
-//存档放在了/myLib
+示例：```gcc  test.c -L/myLib -lsecurity -o test```
+//存档放在了/myLib  
 8.	动态库在Windows中叫动态链接库(.dll)，在Linux和Unix上交共享目标文件(.so)，在Mac上叫动态库(.dylib)。一旦用某个名字编译了库，就不能修改文件名。重命名必须用新的名字重新编译一次。
-创建方式示例：gcc -shared test.o -o C:\libs\test.dll
+创建方式示例：```gcc -shared test.o -o C:\libs\test.dll```
 
 # 标准库：
 在程序开头使用#include调用C标准库。标准库分了好几个部分，每个部分独有一个头文件，列出了该部分的所有函数。示例：#include <stdio.h>.
@@ -118,10 +124,7 @@ FILE *in_file = fopen(“input.txt, “r”);
 示例：free(tmp);
 3.	qsort()是一个排序函数，判断两条数据的大小关系。
 ```
-qsort(void *array,
-         size_t length,
-         size_t item_size,
-	 int (*compar) (const void *, const void *)); //void*指针可以指向任何数据。
+qsort(void *array, size_t length, size_t item_size, int (*compar) (const void *, const void *)); //void*指针可以指向任何数据。
 ``` 
 在写comparator的时候，第一件事是从指针中提取值，因为值以指针的形式传给函数。
 示例：第一个\*拿到保存在地址中的值，第二个把void指针转换为整型指针
