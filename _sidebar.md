@@ -1,2 +1,11 @@
-# 编程语言笔记
+# 编程语言
   * [C](./docs/C.md)
+  * [CPP](./docs/CPP.md)
+  * [Go](./docs/Go.md)
+  * [Matlab](./docs/Matlab.md)
+  * [PHP](./docs/PHP.md)
+  * [Python](./docs/Python.md)
+  * [R](./docs/R.md)
+  * [SQL](./docs/SQL.md)
+ # 软件
+ # 读书

@@ -9,6 +9,10 @@
   <meta name="viewport"
     content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/dolphin.css">
+  <!--Latex-->
+  <!--
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css"/>
+  -->
 </head>
 
 <body>
@@ -20,7 +24,7 @@
       name: '笔记',
       repo: 'https://github.com/csy99/Notes',
       maxLevel: 5,//最大支持渲染的标题层级
-      subMaxLevel: 3,
+      subMaxLevel: 2,
       homepage: 'README.md',
       coverpage: true,
       loadSidebar: true,
@@ -33,13 +37,21 @@
   <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>
   <!--代码高亮-->
   <script src="//unpkg.com/prismjs/components/prism-java.js"></script>
+  <script src="//unpkg.com/prismjs/components/prism-python.js"></script>
+  <script src="//unpkg.com/prismjs/components/prism-c.js"></script>
   <script src="//unpkg.com/prismjs/components/prism-clike.js"></script>
+  <script src="//unpkg.com/prismjs/components/prism-cpp.js"></script>
+  
   <!--全文搜索-->
   <script src="https://cdn.bootcss.com/docsify/4.5.9/plugins/search.min.js"></script>
   <!-- 复制到剪贴板 -->
   <script src="//unpkg.com/docsify-copy-code"></script>
   <!-- 图片缩放 -->
   <script src="//unpkg.com/docsify/lib/plugins/zoom-image.js"></script>
+  <!--Latex-->
+  <!--
+  <script src="//cdn.jsdelivr.net/npm/docsify-katex@latest/dist/docsify-katex.js"></script>
+  -->
 </body>
 
 </html>

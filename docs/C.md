@@ -29,21 +29,21 @@ sizeof(s)会返回15，sizeof(t)会返回4或者8（取决于操作系统）。
 示例：#include “statement.h”
 22.	用结构创建结构化数据类型（把一批数据打包成一样东西）。struct是structured data type的缩写。可以按名访问结构字段（f1.name）。当把一个结构变量赋值给另一个时，只会复制结构的内容。
 示例：
-```
+<pre name="code" class="c">
 struct fish {
-	const char *name; // 保存不想修改的字符串
-	const char *species;
-	int age;
+　　const char *name; // 保存不想修改的字符串
+　　const char *species;
+　　int age;
 }
 struct fish f1 = {“fish1”, “big”, 4};
-```
+</pre>
 23.	可以用typedef为结构命名。创建别名后可以不需要结构名。但是在递归结构中，需要包含一个相同类型的指针，因此必须为结构起一个名字。
 示例：
 ```
 typedef struct fish {
-	const char *name; // 保存不想修改的字符串
-	const char *species;
-	int age;
+　　const char *name; // 保存不想修改的字符串
+　　const char *species;
+　　int age;
 } ff; // ff将成为struct fish的别名
 ff f1 = {“fish1”, “big”, 4};
 ```
@@ -62,11 +62,11 @@ ff f1 = {“fish1”, “big”, 4};
 示例：//将make规则保存在当前目录下一个叫Makefile的文本文件中
 ```
 launch.o: launch.c launch.h thruster.h //依赖文件
-	gcc -c launch.c //生成方法
+　　gcc -c launch.c //生成方法
 thruster.o: thruster.h thruster.c
-	gcc -c thruster.c
+　　gcc -c thruster.c
 launch: launch.o thruster.o
-	gcc launch.o thruster.o -o launch
+　　gcc launch.o thruster.o -o launch
 ```
 //在控制台输入以下指令
 ```
@@ -119,18 +119,15 @@ FILE *in_file = fopen(“input.txt, “r”);
 
 ## <stdlib.h>
 1.	malloc()会要求操作系统在heap中分配空间，并返回一个指针指向这个空间。该函数接收一个参数：所需要的字节数。在不知道确切字节数的情况下，常与sizeof一起使用。
-示例：Person tmp = malloc(sizeof(Person));
+示例：```Person tmp = malloc(sizeof(Person));```
 2.	free()函数可以释放存储器。
-示例：free(tmp);
+示例：```free(tmp);```
 3.	qsort()是一个排序函数，判断两条数据的大小关系。
-```
-qsort(void *array, size_t length, size_t item_size, int (*compar) (const void *, const void *)); //void*指针可以指向任何数据。
-``` 
+```qsort(void *array, size_t length, size_t item_size, int (*compar) (const void *, const void *)); //void*指针可以指向任何数据。``` 
+
 在写comparator的时候，第一件事是从指针中提取值，因为值以指针的形式传给函数。
 示例：第一个\*拿到保存在地址中的值，第二个把void指针转换为整型指针
-```
-int a = *(int*) score_a;
-```
+```int a = *(int*) score_a;```
 
 ## <stdarg.h>
 所有处理可变参数函数的代码都在这个库中。可变参数将保存在va_list中。可以用va_start()、va_arg()和va_end()控制va_list。可变参数函数至少需要一个普通参数。读取参数时不能超过给出的参数个数，且需要知道参数类型。
@@ -144,12 +141,13 @@ int a = *(int*) score_a;
 示例：
 //最后一个参数表示选项a和e有效冒号表示e需要一个参数
 //getopt()会用optarg变量指向这个参数
-getopt(argc, argv, “ae:”)  
+```getopt(argc, argv, “ae:”)  ```
 读完全部选项以后，应该用optind变量跳过它们。
 示例：
+```
 argc -= optind;
 argv += optind;
-
+```
 
 
 
