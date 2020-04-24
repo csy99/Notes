@@ -1,5 +1,5 @@
 <p align="center">
-<img src="http://pic.17qq.com/uploads/ghepbhobdz.jpeg" width="460" height="320"/>
+<img src="./pics/blue.jpg" width="600" height="300"/>
 </p>
 <h1 align="center">个人笔记</h1>
 

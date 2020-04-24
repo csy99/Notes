@@ -1,11 +1,27 @@
 * __编程语言__
-  * [C](./docs/C.md)
-  * [CPP](./docs/CPP.md)
-  * [Go](./docs/Go.md)
-  * [Matlab](./docs/Matlab.md)
-  * [PHP](./docs/PHP.md)
-  * [Python](./docs/Python.md)
-  * [R](./docs/R.md)
-  * [SQL](./docs/SQL.md)
+  * [C](./docs/programming/C.md)
+  * [CPP](./docs/programming/CPP.md)
+  * [Go](./docs/programming/Go.md)
+  * [Matlab](./docs/programming/Matlab.md)
+  * [PHP](./docs/programming/PHP.md)
+  * [Python](./docs/programming/Python.md)
+  * [R](./docs/programming/R.md)
+  * [SQL](./docs/programming/SQL.md)
+  
 * __软件__
+  * [Github](./docs/app/github.md)
+  * [HBase](./docs/app/hbase.md)
+  * [Linux](./docs/app/linux.md)
+  * [Tableau](./docs/app/tableau.md)
+
+* __刷题面试__
+  * [Code Temp](./docs/interview/Alg_Template.md)
+  
+* __深度学习__
+  * [深度学习入门](./docs/dl/intro/dl_intro.md)
+  
 * __读书__
+  * [2020](./docs/reading/2020.md)
+  * [2019](./docs/reading/2019.md)
+  * [2018](./docs/reading/2018.md)
+  * [2017](./docs/reading/2017.md)
