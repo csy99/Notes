@@ -57,4 +57,24 @@ have locally**
 git pull origin master
 git push origin master --此时可以成功push
 ```
-从远端拿东西最好用git fetch + git merge。如果直接使用git pull会覆盖本地有但是远端没有的文件。
+从远端拿东西最好用git fetch + git merge。如果直接使用git pull会覆盖本地有但是远端没有的文件。  
+
+
+# Branch
+```
+git checkout -b newbranch    #新建branch，并且进入到new branch
+git checkout master          #切换回到master
+git merge newbranch          #这里是分支名字，将new branch内容合并到master branch
+git branch -d newbranch      #当前分支已经没用了，记得删除，除非还需要用到
+git branch                   #查看当前所在分支
+git branch -A/--all          #查看所有分支
+```
+
+# Roll Back
+```
+git log                                 #查看版本
+git reset --hard <commit_id>            #回退到指定版本
+git push origin HEAD --force            #清空这个commitid之后所有已经提交了的commit
+git revert <commit-id>                  #剔除某次提交，其后的commit不受到影响
+```
+

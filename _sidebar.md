@@ -14,8 +14,18 @@
   * [Linux](./docs/app/linux.md)
   * [Tableau](./docs/app/tableau.md)
 
+* __数据库__
+  * [范式](./docs/database/NF.md)
+  * [谓词下推](./docs/database/Predicate_Pushdown.md)
+
+* __操作系统__
+  * [进程通信方式](./docs/os/IPC.md)
+
+* __Java基础__
+  * [暂停线程](./docs/java_basic/suspend_thread.md)
+
 * __刷题面试__
-  * [Code Temp](./docs/interview/Alg_Template.md)
+  * [Code Temp](./docs/algorithm/Alg_Template.md)
   
 * __深度学习__
   * [深度学习入门](./docs/dl/intro/dl_intro.md)
