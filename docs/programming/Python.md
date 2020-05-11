@@ -22,10 +22,10 @@ print()中调用end参数决定下一次print的开始位置。默认是end=’\
 
 ## 警告
 消除所有警告
-<pre name="code" class="python">
+```python
 import warnings
 warnings.filterwarnings(‘ignore’)
-</pre>
+```
 
 ## 列表
 i.	可用[]定义空列表。  
@@ -50,7 +50,7 @@ ii.	键与键值相配对。调用时使用键而非指数作为索引
 iii.给一个不存在的键赋值会直接将这个键加入字典中  
 iv.	删除：```del dict[‘键’]```将该组键与键值一起删掉  
 v.	更改：
-```
+```python
 dict[‘新键’] = dict.pop[‘老键’] 
 dict.update({‘新键’: dict.pop(‘老键’)})
 # 先删后加
@@ -121,7 +121,7 @@ else:
 注意Python中不能用java（!Bool）的方式表示Bool的否定来进行判断。
 ### 循环
 i.	for  
-```
+```python
 for i in [1,3,6,9]: #列表中的每一个值，也可以循环字符串  
 for i in range(4): #循环0-3  
 for i in range(0, 30, 2): #循环1-29，步长为2
@@ -141,7 +141,7 @@ def 函数名(参数):
 # Pandas
 以numpy数据结构为基础构建的库。
 ## 序列
-```
+```python
 s1 = pd.Series([1,2,3,4,5]) # 转换成序列
 s1.values # 返回所包含的值
 s1. index # 返回起始点和步长。非等差数列终止点和步长返回一个不太靠谱的数值。
@@ -157,7 +157,7 @@ s1. index # 返回起始点和步长。非等差数列终止点和步长返回�
 
 ## DataFrame
 ### 打印
-```
+```python
 dat1 = {‘A’:[1,2,3], ‘B’:[3,4,5], ‘C’:[5,7,9]}
 df1 = pd.DataFrame(dat1)
 print(df1) # 将这组数据以表格形式打印出来
@@ -174,7 +174,7 @@ index是每一行的索引
 
 ### 指定列名
 字典法
-```
+```python
 d  = {‘one’ : pd.Series([1,2,3], index = [‘a’,’b’,’c’]), ‘two : pd.Series([1,2,3,4], index = [‘a’,’b’,’c’,’d’])}
 df3 = pd.DataFrame(d) # 行名是index，列名是字典名
 df.index # return Index(index = [‘a’,’b’,’c’,’d’], dtype=’object’)
@@ -202,7 +202,7 @@ e.g. ```df.apply(lambda x: x+1) ```仍然是以列为单位进行操作
 	- 对其中一列调用.pct_change()函数可以计算百分比差值。
 	- 对其中一列调用.shift(m)函数可以返回该单元格在此列向上m行的值，m可以是负数。
 ### 删除元素
-```
+```python
 df.drop([‘row index’])
 df.drop(‘column name’, axis = 1) # 删除列
 ```
@@ -257,13 +257,13 @@ pd.melt()
 numpy.random.randn()是从标准正态分布中返回一个或多个样本值。  
 numpy.random.rand()的随机样本位于\[0,1)中。  
 ## 多维数组变换
-```
+```python
 X = np.array([ [1, 2, 3 ], [1, 2, 3 ] ])
 X = X.flatten()
 ```
 转换为一维数组
 ## 生成数据
-```
+```python
 x = np.arange(0, 10, 0.1) #以0.1位单位，生成0-10的数字
 x.reshape(3,5) #转换成矩阵
 np.zeros((3,4))
@@ -275,7 +275,7 @@ np.fromfunction(func, (4,5))
 ## 正余弦
 ```np.sin(x)```
 ## 输入输出
-```
+```python
 np.loadtxt(‘file.txt’)
 np.genfromtxt(‘file.csv’, delimiter = ‘,’)
 np.savetxt(‘file.txt’, arr, delimiter = ‘ ’)
@@ -285,7 +285,7 @@ np.savetxt(‘file.csv’, arr, delimiter = ‘,’)
 # matplotlib
 ## matplotlib.pyplot
 折线图： 
-```
+```python
 plt.figure(figsize=(10,5)) #定义图片大小
 plt.plot(x,y1,label = ‘A’) #代入数值并画出图片（未显示在屏幕上），默认为折线图
 plt.plot(x,y2,label = ‘B’) #多组数据进行对比
@@ -299,7 +299,7 @@ plt.show() #将图片打印出来
 ```plt.bar(x,y, color = ‘#9999ff’, width = 0.5) ``` 设置颜色和柱子的宽度。  
 柱状图想要进行两组数据的对比需要改变两组数据x的坐标(柱子的中心点)，否则柱子会重叠在一起。  
 例：
-```
+```python
 x1= [0.25, 1.25, 2.25, …]
 x2= [0.75, 1.75, 2.75, …]
 plt.bar(x1, y1, width = 0.5) 
@@ -307,7 +307,7 @@ plt.bar(x2, y2, width = 0.5)
 ```
 
 点状图： 
-```
+```python
 plt.scatter(x,y)或者plt.plot(x, y, ’.’)
 # 加趋势线
 plt.plot(x,x)
@@ -315,7 +315,7 @@ plt.legend((‘real data’, ‘fitted line’))
 ```
 
 盒状图： 
-```
+```python
 plt.boxplot(x) # 研究outlier
 plt.boxplot((x,y)) # 也可以把两组数据画在一个图上
 plt.xticks([1,2], [‘A’, ‘B’])或plt.yticks() # 将轴的标记从原来的值([1,2])更改成新的值[‘A’, ‘B’]
@@ -326,27 +326,27 @@ plt.xticks([1,2], [‘A’, ‘B’])或plt.yticks() # 将轴的标记从原来�
 
 其他技巧：
 改变x轴显示值且并不标出所有值（易读）：
-```
+```python
 k = list(range(0,100,10)) #设定间隔长度
 plt.xticks(df1.index[k], df1.Date[k])
 ```
 ticks中r'$\pi/2$' 显示π/2 (Latex)
 
 简便画图：
-```
+```python
 df1.index = df1['Date'] #注意Date不能是字符串格式
 df1['Close'].plot()
 ```
 
 同时显示多个图：
-```
+```python
 fig = plt.figure(figsize = (20,40)) #包括了所有subplot范围的区域
 ax = fig.add_subplot(4,2,1) #一共四张小图，每一行显示两张，这个是第一张图
 df1.High.plot(label = 'High') #High均为列名
 ```
 
 对图进行注释：
-```
+```python
 fig = plt.figure(figsize = (20,40)) 
 ax = fig.add_subplot(1,1,1)
 x = df1.Close[:80]
@@ -356,7 +356,7 @@ ax.annotate(str(df1.index[40]), (x[40], y[40])) #左边参数为标记内容，�
 ```
 
 ## 显示图像
-```
+```python
 from matplotlib.image import imread
 img = imread(‘path’)
 plt.imshow(img)
@@ -364,7 +364,7 @@ plt.show()
 ```
 
 # Seaborn
-```
+```python
 import Seaborn as sns
 sns.regplot(df1, df2) #自动添加回归线和CI
 #画出分布图
@@ -389,7 +389,7 @@ g. set_xticklabels(rotation = 30) #x坐标旋转
 # Urllib
 ```import urllib.request```  
 读取网站数据：
-```
+```python
 file = urllib.request.urlopen(url)
 data = file.read()
 js = data.decode(‘utf8’) #用utf8格式解码
@@ -401,7 +401,7 @@ df = pd.DataFrame.from_dict(ps, orient = ‘index’) #用index做每一行的�
 
 
 # Scipy
-```
+```python
 from scipy.optimize import minimize 
 def f(x):
 	return …
@@ -438,7 +438,7 @@ sns.distplot(yt2)
 ```
 
 # mpl_finance
-```
+```python
 from mpl_finance import candlestick_ohlc  
 candlestick_ohlc(ax, quotes, colorup='red', colordown='green', width=0.5)
 # 前两个参数必填。ax指的是Axes，即这一个小图的位置。Quotes填数据的必要信息。这里需要携程sequence of sequencies，使用date2num函数。
