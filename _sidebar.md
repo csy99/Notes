@@ -9,23 +9,26 @@
   * [SQL](./docs/programming/SQL.md)
   
 * __软件__
-  * [Github](./docs/app/github.md)
-  * [HBase](./docs/app/hbase.md)
-  * [Linux](./docs/app/linux.md)
-  * [Tableau](./docs/app/tableau.md)
+  * [Github](./docs/App/github.md)
+  * [HBase](./docs/App/hbase.md)
+  * [Linux](./docs/App/Linux.md)
+  * [Tableau](./docs/App/tableau.md)
 
 * __数据库__
-  * [范式](./docs/database/NF.md)
-  * [谓词下推](./docs/database/Predicate_Pushdown.md)
+  * [范式](./docs/Database/NF.md)
+  * [谓词下推](./docs/Database/Predicate_Pushdown.md)
 
 * __操作系统__
-  * [进程通信方式](./docs/os/IPC.md)
+  * [进程通信方式](./docs/OS/IPC.md)
 
 * __Java基础__
-  * [暂停线程](./docs/java_basic/suspend_thread.md)
+  * [暂停线程](./docs/Java_basic/suspend_thread.md)
 
 * __刷题面试__
-  * [Code Temp](./docs/algorithm/Alg_Template.md)
+  * [声明](./docs/Algorithm/readme.md)
+  * [DP](./docs/Algorithm/dp.md)
+  * [Tree](./docs/Algorithm/tree.md)
+  * [UFS](./docs/Algorithm/UFS.md)
   
 * __深度学习__
   * [深度学习入门](./docs/dl/intro/dl_intro.md)
