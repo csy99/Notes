@@ -70,3 +70,61 @@ class BIT {
 }
 ```
 
+# 线段树 Segment Tree
+1.	Each leaf node represents an element in the array. 
+Each non leaf node covers the union of its children's range.
+
+```java
+class SegmentTreeNode {
+	int start;
+	int end;
+	int sum;  // can be max or min
+	SegmentTreeNode left;
+	SegmentTreeNode right;
+}
+```
+```java
+// time: O(n)
+public SegmentTreeNode build(int start, int end, int[] vals) {
+	if (start == end)
+		return SegmentTreeNode(start, end, vals[start]);
+	int mid = (start + end) / 2;
+	SegmentTreeNode left = build(start, mid, vals);
+	SegmentTreeNode right = build(mid+1, right, vals);
+	return SegmentTreeNode(start, end, left.sum+right.sum, left, right);
+}
+
+// time: O(log n)
+public void update(SegmentTreeNode root, int index, int val) {
+	if (root.start == root.end && root.start == index) {  // a leaf node
+		root.sum = val;
+		return;
+	}
+	int mid = (start + end) / 2;
+	if (index <= mid)
+		update(root.left, index, val);
+	else
+		update(root.right, index, val);
+	root.sum = root.left.sum + root.right.sum;
+}
+
+// time: O(log n + k)
+public int query(SegmentTreeNode root, int l, int r) {
+	if (root.start == l && root.end == j)
+		return root.sum;
+	int mid = (start + end) / 2;
+	if (r <= mid)
+		return query(root.left, l, r);
+	else if (l > mid)
+		return query(root.right, l, r);
+	else 
+		return query(root.left, l, mid) + query(root.right, mid+1, r);
+}
+```
+
+
+
+
+
+
+

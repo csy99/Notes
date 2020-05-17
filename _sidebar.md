@@ -22,8 +22,10 @@
   * [进程通信方式](./docs/OS/IPC.md)
 
 * __Java基础__
+  * [多态](./docs/Java_basic/polymorphism.md)
   * [暂停线程](./docs/Java_basic/suspend_thread.md)
-
+  * [类型转换](./docs/Java_basic/type_conversion.md)
+  
 * __刷题面试__
   * [声明](./docs/Algorithm/readme.md)
   * [DP](./docs/Algorithm/dp.md)
@@ -33,6 +35,8 @@
 * __深度学习__
   * [深度学习入门](./docs/dl/intro/dl_intro.md)
   * [美团](./docs/ML/通用流程.md)
+  
+  
 * __读书__
   * [2020](./docs/reading/2020.md)
   * [2019](./docs/reading/2019.md)
