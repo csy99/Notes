@@ -6,7 +6,10 @@
 5.	不一定会根据index做dp的索引，有可能是根据value。比如背包问题，dp\[n]\[W]。
 内层循环w时候，不需要从0开始，可以从w\[i]开始即可。  
 
+
+
 ## depend on constant number of its sub-problems  
+
 ```java
 // T(n), S(n)->S(1)
 dp = new int[n]
@@ -14,7 +17,10 @@ for i = 1 to n:
 	dp[i] = f(dp[i-1], dp[i-2], ...)
 return dp[n]
 ```
+
+
 ## depend on all its sub-problems
+
 ```java
 // T(n^2), S(n)
 dp = new int[n]
@@ -23,7 +29,10 @@ for i = 1 to n:  // problem size
 		dp[i] = max(dp[i], f(dp[j]))
 return dp[n]
 ```
+
+
 ## two inputs
+
 ```java
 // T(mn), S(mn)
 dp = new int[m][n]
@@ -32,7 +41,10 @@ for i = 1 to m:
 		dp[i][j] = f(dp[i-1][j-1], dp[i-1][j], dp[i][j-1])
 return dp[m][n]
 ```
+
+
 ## depend on uncertain sub-problems
+
 ```java
 // T(n^3), S(n^2)
 dp = new int[m][n]
@@ -43,7 +55,10 @@ for l = 1 to n:  // problem size
 			dp[i][j] = max(dp[i][j], f(dp[i][k], dp[k][j]))
 return dp[1][n]
 ```
+
+
 ## input has two dimensions
+
 Personally, this is very similar to two inputs.   
 ```java
 // T(mn), S(mn)
@@ -53,7 +68,10 @@ for i = 1 to m:
 		dp[i][j] = f(dp[i-1][j], dp[i][j-1])
 return dp[m][n]
 ```
+
+
 ## input has two dimensions, depends on some sub-problems
+
 ```java
 // T(kmn), S(kmn)->S(mn)
 dp = new int[m][n]
@@ -63,4 +81,6 @@ for k = 1 to K:
 			dp[k][i][j] = f(dp[k-1][i+di][j+dj])
 return dp[K][m][n]
 ```
+
+
 

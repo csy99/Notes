@@ -5,20 +5,32 @@
 
 **建图方式**  
 - 邻接矩阵 Adjacency matrix  
+	
 	space: O(|V|^2)  
+	
 	search: O(1)
+	
 - 邻接表 Adjacency list  
+	
 	space: O(|V|+|E|) = O(|V|^2) for dense graph  
+	
 	search: O(N)   
+	
 - 边表 Edge list  
+	
 	space: O(|E|)  
+	
 	search: O(N)   
+	
+	
 
 ## 回溯法
 1.	记得还原每一步所做的改动
 2.	添加结果的时候不能只是添加引用，要重新创建对象
 3.	不符合要求的进行剪枝
 4.	考虑输入变量是否需要排序
+
+
 
 ## 深度优先 DFS
 1.	只需找到多组解其中一种的，首先考虑DFS  
@@ -37,7 +49,10 @@ public void dfs(Node v) {
 }
 ```
 
+
+
 ## 广度优先 BFS
+
 1.	找最短路径，首先考虑BFS   
 2.  类似 level order traversal  
 ```java
@@ -55,7 +70,10 @@ public void bfs(Node v) {
 }
 ```
 
+
+
 ## Spanning Tree
+
 If tree T is a subgraph of G, and it contains all vertices of G
 设Spanning Tree的顶点和边分别是V'和E'  
 |V'| = |V|  
@@ -94,7 +112,10 @@ for _ in range(n-1):
 return cost
 ```
 
+
+
 ## 拓扑排序 Topological Order
+
 1.	BFS或者DFS都可能是解法 
 ```java
 public void toporder(List<Node> nodes) {
@@ -133,9 +154,49 @@ public void toporder(List<Node> nodes) {
 
 
 
+## 并查集 Union Find
 
+1.	找一个共同的祖先或者连接，可以使用并查集  
+2. 	如果题目没有给出一个明确的n，很可能是并查集的变体  
 
-
-
+```java
+class UFS {  
+    int[] parents;  
+    int[] ranks;  
+      
+    public UFS(int n) {  
+        parents = new int[n+1];  
+        ranks = new int[n+1];  
+        for (int i = 0; i < n+1; i++) {  
+            parents[i] = i;  
+            ranks[i] = 1;  
+        }  
+    }  
+      
+    public int find(int u) {  
+        while (u != parents[u]) {  
+            parents[u] = parents[parents[u]];  
+            u = parents[u];  
+        }  
+        return u;  
+    }  
+      
+    public boolean union(int u, int v) {  
+        int ru = find(u);  
+        int rv = find(v);  
+        if (ru == rv) return false;  
+          
+        if (ranks[ru] > ranks[rv])  
+            parents[rv] = ru;  
+        else if (ranks[rv] > ranks[ru])  
+            parents[ru] = rv;  
+        else {  
+            parents[ru] = rv;  
+            ranks[rv] += 1;  
+        }   
+        return true;      
+    }  
+}  
+```
 
 

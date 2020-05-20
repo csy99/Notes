@@ -28,12 +28,21 @@
   
 * __刷题面试__
   * [声明](./docs/Algorithm/readme.md)
-  * [DP](./docs/Algorithm/dp.md)
+  * [数组](./docs/Algorithm/arr.md)
+  * [二分搜索](./docs/Algorithm/binary_search.md)
+  * [排列组合](./docs/Algorithm/cp.md)
+  * [动态规划](./docs/Algorithm/dp.md)
+  * [图](./docs/Algorithm/graph.md)
+  * [贪心算法](./docs/Algorithm/greedy.md)
+  * [链表](./docs/Algorithm/list.md)
+  * [数学](./docs/Algorithm/math.md)
+  * [栈&队列](./docs/Algorithm/stq.md)
+  * [字符串](./docs/Algorithm/string.md)
   * [Tree](./docs/Algorithm/tree.md)
-  * [UFS](./docs/Algorithm/UFS.md)
+  
   
 * __深度学习__
-  * [深度学习入门](./docs/dl/intro/dl_intro.md)
+  * [深度学习入门](./docs/DL/intro/dl_intro.md)
   * [美团](./docs/ML/通用流程.md)
   
   
@@ -42,3 +51,6 @@
   * [2019](./docs/reading/2019.md)
   * [2018](./docs/reading/2018.md)
   * [2017](./docs/reading/2017.md)
+  
+* __总结__
+  * [大学学期总结](./docs/summary/course_summary.md)
