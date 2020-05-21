@@ -57,9 +57,9 @@
 
 11.  交叉熵误差
 
-    E = -$\sum_{k}^{}{t_{k}\ \log y_{k}}$
+    $E = -\sum_{k}{t_k log({y_k})}$
 
-    t~k~是正确解标签，只有正确解标签的索引为1，其他均为0。
+    ${t_k}$是正确解标签，只有正确解标签的索引为1，其他均为0。
 
     使用代码实现：
 	```python
@@ -69,23 +69,26 @@
 		return -np.sum(t*np.log(y+delta))
 	```
 	
-4.  小批量学习(**mini-batch**)：从全部数据中选出一部分，作为全部数据的近似。
+12. 小批量学习(**mini-batch**)：从全部数据中选出一部分，作为全部数据的近似。
 
     在python中可以使用np.random.choice(train\_size, batch\_size)随机抽取。
+
+    mini-batch版交叉熵误差代码实现：
+
     
-mini-batch版交叉熵误差代码实现：
+
     ```python
-	def cross_entropy_error(y, t):
+    def cross_entropy_error(y, t):
     	if y.ndim == 1:
-		t = t.reshape(1, t.size)
-		y = y.reshape(1, y.size)
-		batch_size = y.shape[0]
-		delta = 1e-7
-		return -np.sum(t*np.log(y+delta))/batch_size
-	```
-	
-如果监督数据是标签形式(未经过独热编码)，可以将log()中的y改成`y[np.arange(batch_size), t]`。
-    
+    	t = t.reshape(1, t.size)
+    	y = y.reshape(1, y.size)
+    	batch_size = y.shape[0]
+    	delta = 1e-7
+    	return -np.sum(t*np.log(y+delta))/batch_size
+    ```
+
+    如果监督数据是标签形式(未经过独热编码)，可以将log()中的y改成`y[np.arange(batch_size), t]`。
+
 5.  引入损失函数的原因：在神经网络的学习中，寻找最优参数时，要寻找使损失函数的值尽可能小的参数。需要计算参数的梯度，然后以次为指引，逐步更新参数的值。不能把识别精度作为指标，否则参数的梯度在绝大多数地方会变为0。调参后，损失函数可以发生连续性的变化，而识别精度是离散的值。
 
 14. 梯度：由全部变量的偏导数汇总而成的向量称为梯度。
@@ -130,7 +133,7 @@ mini-batch版交叉熵误差代码实现：
     
 19. 乘法结点：
 
-    ```
+    ```python
     class MulLayer:
         def __init__(self):
             self.x = None

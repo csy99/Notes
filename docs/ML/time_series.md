@@ -74,5 +74,81 @@ The first window is placed at the beginning of the series. The final state vecto
 - training can be slow
 - consecutive training batches are very correlated, BP may not work well
 
+```python
+def seq_window(series, window_size):
+    series = tf.expand_dims(series, axis=-1)
+    ds = tf.data.Dataset.from_tensor_slices(series)
+    ds = ds.window(window_size+1, shift=window_size, drop_remainder=True)
+    ds = ds.flat_map(lambda w: w.batch(window_size+1))
+    ds = ds.map(lambda w: (w[:-1], w[1:]))
+    return ds.batch(1).prefetch(1) ## use batch=1
+```
 
+```python
+model = keras.models.Sequential([
+    keras.layers.SimpleRNN(100, return_sequences=True, stateful=True, batch_input_shape=[1,None,1]),
+    keras.layers.SimpleRNN(100, return_sequences=True, stateful=True),
+    keras.layers.Dense(1)
+])
+```
+
+We need manually set the state to zero state at the beginning of each epoch. 
+
+```python
+class ResetState(keras.callbacks.Callback):
+    def on_epoch_begin(self, epoch, logs):
+        self.model.reset_states()
+reset_ = ResetState()
+model.fit(callbacks=[es, checkpoint, reset_])
+```
+
+
+
+## LSTM
+
+Forget Gate: learn when to forget/preserve
+
+Input Gate: output 1, output  0 
+
+Output Gate: 
+
+![LSTM Cell](.\pics\lstm.png)
+
+```python
+model = keras.models.Sequential([
+    keras.layers.LSTM(100, return_sequences=True, 
+                     stateful=True, batch_input_shape=[1,None,1])
+    keras.layers.LSTM(100, return_sequences=True, stateful=True),
+    keras.layers.Dense(1)
+])
+```
+
+
+
+## CNN
+
+We can also use 1D Conv Net in time series prediction. 
+
+```python
+model = keras.models.Sequential([
+    keras.layers.Conv1D(filters=32, kernel_size=5,
+                       strides=1, padding="causal",
+                       activation="relu",
+                       input_shape=[None,1]),
+    keras.layers.LSTM(32, return_sequences=True),
+    keras.layers.Dense(1)
+])
+```
+
+Small dilation let layers learn short term patterns, while large dilation ley layers learn long term patterns. 
+
+```python
+model = keras.models.Sequential()
+model.add(keras.layers.InputLayer(input_shape=[None,1]))
+for dilation in [1,2,4,8,16]:
+    model.add(
+    	keras.layers.Conv1D(dilation_rate=dilation)
+    )
+model.add(keras.layers.Conv1D(filters=1, kernel_size=1))
+```
 
