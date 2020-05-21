@@ -9,10 +9,10 @@
   * [SQL](./docs/programming/SQL.md)
   
 * __软件__
-  * [Github](./docs/App/github.md)
-  * [HBase](./docs/App/hbase.md)
-  * [Linux](./docs/App/Linux.md)
-  * [Tableau](./docs/App/tableau.md)
+  * [Github](./docs/app/github.md)
+  * [HBase](./docs/app/hbase.md)
+  * [Linux](./docs/app/Linux.md)
+  * [Tableau](./docs/app/tableau.md)
 
 * __数据库__
   * [范式](./docs/Database/NF.md)
