@@ -27,24 +27,30 @@
   * [类型转换](./docs/Java_basic/type_conversion.md)
   
 * __刷题面试__
-  * [声明](./docs/Algorithm/readme.md)
-  * [数组](./docs/Algorithm/arr.md)
-  * [二分搜索](./docs/Algorithm/binary_search.md)
-  * [排列组合](./docs/Algorithm/cp.md)
-  * [动态规划](./docs/Algorithm/dp.md)
-  * [图](./docs/Algorithm/graph.md)
-  * [贪心算法](./docs/Algorithm/greedy.md)
-  * [链表](./docs/Algorithm/list.md)
-  * [数学](./docs/Algorithm/math.md)
-  * [栈&队列](./docs/Algorithm/stq.md)
-  * [字符串](./docs/Algorithm/string.md)
+  * [References](./docs/Algorithm/readme.md)
+  * [Array](./docs/Algorithm/arr.md)
+  * [Binary Search](./docs/Algorithm/binary_search.md)
+  * [C&P](./docs/Algorithm/cp.md)
+  * [DP](./docs/Algorithm/dp.md)
+  * [Graph](./docs/Algorithm/graph.md)
+  * [Greedy](./docs/Algorithm/greedy.md)
+  * [List](./docs/Algorithm/list.md)
+  * [Math](./docs/Algorithm/math.md)
+  * [Stack&Queue](./docs/Algorithm/stq.md)
+  * [String](./docs/Algorithm/string.md)
   * [Tree](./docs/Algorithm/tree.md)
   
   
 * __深度学习__
   * [深度学习入门](./docs/DL/intro/dl_intro.md)
-  * [美团](./docs/ML/通用流程.md)
+  * [TensorFlow Intro](./docs/DL/TF.md)
   
+
+* __机器学习__
+  * [References](./docs/ML/readme.md)
+  * [问题建模](./docs/ML/1problem_modeling.md)
+  * [特征工程](./docs/ML/2feature_engineering.md)
+  * [模型选择](./docs/ML/3models.md)
   
 * __读书__
   * [2020](./docs/reading/2020.md)
