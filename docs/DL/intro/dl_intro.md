@@ -31,11 +31,11 @@
 
 6.  softmax函数
 
-    y~k~ = $\frac{exp(a_{k})}{\sum_{i = 1}^{n}{exp(a_{i})}}$
+    $y_k = \frac{exp(a_{k})}{\sum_{i = 1}^{n}{exp(a_{i})}}$
 
     直接按照公式实现容易出现溢出问题。改进方法：
 
-    y~k~ =$\frac{C\ exp(a_{k})}{C\sum_{i = 1}^{n}{exp(a_{i})}}$ = $\frac{exp(a_k+logC)}{\sum_{i = 1}^{n}{exp(a_{i} + logC)}}$
+    $y_k = \frac{C\ exp(a_{k})}{C\sum_{i = 1}^{n}{exp(a_{i})}}$ = $\frac{exp(a_k+logC)}{\sum_{i = 1}^{n}{exp(a_{i} + logC)}}$
     
     logC可以使用任意值，一般使用输入信号中最大值。
 
@@ -91,11 +91,11 @@
 
 5.  引入损失函数的原因：在神经网络的学习中，寻找最优参数时，要寻找使损失函数的值尽可能小的参数。需要计算参数的梯度，然后以次为指引，逐步更新参数的值。不能把识别精度作为指标，否则参数的梯度在绝大多数地方会变为0。调参后，损失函数可以发生连续性的变化，而识别精度是离散的值。
 
-14. 梯度：由全部变量的偏导数汇总而成的向量称为梯度。
+13. 梯度：由全部变量的偏导数汇总而成的向量称为梯度。
 
-    x = x - η$\frac{\partial f}{\partial x}$
+    $x = x - \eta\frac{\partial f}{\partial x}$
 
-    η表示更新量，称为学习率。
+    $\eta$表示更新量，称为学习率。
 
     梯度下降法代码实现：
 
@@ -170,12 +170,14 @@
 
     
 
-21. 激活函数的ReLU层：
+20. 激活函数的ReLU层：
 
-    $\frac{\partial f}{\partial x}$ = $\left\{ \begin{matrix}
+    $$
+    \frac{\partial f}{\partial x} = \left\{ \begin{matrix}
     1,\ \  x > 0 \\
     0,\ \  x \leq 0 \\
-    \end{matrix} \right.\ $
+    \end{matrix} \right.\
+    $$
 
 22. 激活函数的Sigmoid层：
 
