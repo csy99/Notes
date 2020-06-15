@@ -164,7 +164,7 @@ y_pred = model.predict(xtest)
 
 Sequential models make data go through the full stack of layers. The workflow can be distorted by wide&deep neural network. 
 
-<img alt="wide&deep neural network" src="\pics\1001.PNG" width="400" height="300" />
+<img alt="wide&deep neural network" src="/pics/1001.PNG" width="400" height="300" />
 
 ```python
 input_ = keras.layers.Input(shape=xtrain.shape[1:])
@@ -177,7 +177,7 @@ model = keras.Model(inputs=[input_], outputs=[output])
 
 If we want to send a subset of the features through the wide path and a different subset through the deep path, one solution is to use multiple inputs. 
 
-<img alt="two inputs" src="\pics\1002.png" width="400" height="300">
+<img alt="two inputs" src="/pics/1002.png" width="400" height="300">
 
 ```python
 input_A = keras.layers.Input(shape=[5], name="wide_input")
