@@ -40,14 +40,12 @@
   * [String](./docs/Algorithm/string.md)
   * [Tree](./docs/Algorithm/tree.md)
   
-  
 * __ML&DL__
   * [深度学习入门](./docs/DL/01intro/dl_intro.md)
   * [ML通用流程](./docs/DL/C02.md)
   * [Hands-on ML](./docs/DL/C03.md)
   * [NLP工业应用](./docs/DL/04NLP_Industrial_Application/NLP_Industrial_Application.md)
   * [TensorFlow Intro](./docs/DL/05TF/TF.md)
-  
   
 * __读书__
   * [2020](./docs/reading/2020.md)
