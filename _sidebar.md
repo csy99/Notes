@@ -21,7 +21,7 @@
 * __操作系统__
   * [进程通信方式](./docs/OS/IPC.md)
 
-* __Java基础__
+* __Java_Basic__
   * [多态](./docs/Java_basic/polymorphism.md)
   * [暂停线程](./docs/Java_basic/suspend_thread.md)
   * [类型转换](./docs/Java_basic/type_conversion.md)
@@ -41,16 +41,13 @@
   * [Tree](./docs/Algorithm/tree.md)
   
   
-* __深度学习__
-  * [深度学习入门](./docs/DL/intro/dl_intro.md)
-  * [TensorFlow Intro](./docs/DL/TF.md)
+* __ML&DL__
+  * [深度学习入门](./docs/DL/01intro/dl_intro.md)
+  * [ML通用流程](./docs/DL/C02.md)
+  * [Hands-on ML](./docs/DL/C03.md)
+  * [NLP工业应用](./docs/DL/04NLP_Industrial_Application/NLP_Industrial_Application.md)
+  * [TensorFlow Intro](./docs/DL/05TF/TF.md)
   
-
-* __机器学习__
-  * [References](./docs/ML/readme.md)
-  * [问题建模](./docs/ML/1problem_modeling.md)
-  * [特征工程](./docs/ML/2feature_engineering.md)
-  * [模型选择](./docs/ML/3models.md)
   
 * __读书__
   * [2020](./docs/reading/2020.md)

@@ -7,7 +7,7 @@
 
 ## Fast Power
 
-$x =  a * b^n $, n is a positive integer, a and b can be integers or matrices
+$x =  a * b^n$, n is a positive integer, a and b can be integers or matrices
 
 algorithm: fast power by squaring
 

@@ -1,7 +1,9 @@
 # Combination 
-1.  如果需要返回的组合长度不一样，则需要在外层调用dfs时加循环
-2.  注意去重   
-time: O(2^n)
+1. 如果需要返回的组合长度不一样，则需要在外层调用dfs时加循环
+
+2. 注意去重
+
+   time: O(2^n)
 ```java
 int[] nums;
 List<List<Integer>> res = new ArrayList();
@@ -32,11 +34,16 @@ public List<List<Integer>> subsetsWithDup(int[] nums) {
 }
 ```
 
+
+
 # Permutation
-1.  如果有重复数字，需要先排序，且不能使用HashSet记录是否被使用过，
-需要用一个boolean数组。    
-2.  注意去重   
-time: O(n!)
+
+1. 如果有重复数字，需要先排序，且不能使用HashSet记录是否被使用过，
+   需要用一个boolean数组。    
+
+2. 注意去重   
+
+   time: O(n!)
 ```java
 List<List<Integer>> res = new ArrayList();
 int[] nums;
@@ -67,11 +74,11 @@ private void dfs(List<Integer> cur, HashSet<Integer> used) {
 }
 ```
 
-	
-	
-	
-	
-	
-	
-	
+
+​	
+​	
+​	
+​	
+​	
+​	
 

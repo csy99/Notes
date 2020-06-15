@@ -222,7 +222,7 @@ Input Gate: output 1, output  0
 
 Output Gate: 
 
-![LSTM Cell](C:/Personal Note/docs/ML/pics/lstm.png)
+![LSTM Cell](/ML/pics/lstm.png)
 
 ```python
 model = keras.models.Sequential([
