@@ -43,6 +43,17 @@ tf.__version__ #2.0.0
 keras.__version__ #2.2.4-tf
 ```
 
+Build using MNIST. 
+
+```python
+fashion_mnist = keras.datasets.fashion_mnist
+(X_train_full, ytrain_full), (X_test, ytest) = fashion_mnist.load_data()
+X_train_full.shape
+xval, xtrain = X_train_full[:5000]/255., X_train_full[5000:]/255.
+yval, ytrain = ytrain_full[:5000], ytrain_full[5000:]
+class_names = ["T-shirt", "Trouser", "Pullover", "Dress", "Coat", "Sandal", "Shirt", "Sneaker", "Bag", "Ankle boot"]
+```
+
 
 
 ## Sequential API
@@ -358,6 +369,28 @@ When a region of the space turns out to be good, it should be explored more. In 
 - Spearmint
 - Hyperband
 - Sklearn-Deap
+
+#### Num of Hidden Layers/Neurons
+
+Depending on the dataset, it can sometimes help to make the first hidden layer bigger than the others. In practice, we can pick a model with more layers and neurons than we actually need, then use early stopping and other regularization tech to prevent it from overfitting. 
+
+#### Learning Rate
+
+The optimal one is about half of the maximum learning rate. One way to find a good learning rate is to start with a very low one and gradually increases to a very large value by multiplying by a constant factor at each iteration. 
+
+LR often depends on the batch size. So change them in pair. 
+
+#### Optimizer
+
+--. 
+
+#### Batch size
+
+GPU can process large batch sizes efficiently, so we can choose the largest batch size that can fit in GPU RAM.  We can try to use a large batch size, using learning rate warmup, and if training is unstable or the final performance is disappointing, then try a smaller one. 
+
+#### Activation function
+
+ReLU is a good default. 
 
 
 

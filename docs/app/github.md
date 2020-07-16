@@ -1,5 +1,5 @@
 # Intro
-git: system for version control  
+git: system for version control 
 github: website to upload your directory
 
 .md (markdown file):
