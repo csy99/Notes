@@ -35,8 +35,6 @@ public List<List<Integer>> subsetsWithDup(int[] nums) {
 
 
 
-
-
 # Permutation
 
 1. 如果有重复数字，需要先排序，且不能使用HashSet记录是否被使用过，

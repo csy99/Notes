@@ -166,7 +166,7 @@ NN often expect an input value ranging from 0 to 1.
 
 #### Standardization
 
-subtracts the mean value and then divides by the std. Standardization is less affected by outliers. Us StandardScaler. 
+subtracts the mean value and then divides by the std. Standardization is less affected by outliers. Use StandardScaler. 
 
 ### Transformation Pipelines
 
@@ -289,7 +289,7 @@ We can also compute a 95% CI for the generalization error using scipy.stats.t.in
 
 ```python
 from scipy import stats
-confidence =0.95
+confidence = 0.95
 sqr_err = (final_pred - ytest) ** 2
 np.sqrt(scipy.stats.t.interval(confidence, len(sqr_err)-1, loc=sqr_err.mean(), scale=scipy.stats.sem(sqr_err)))
 ```

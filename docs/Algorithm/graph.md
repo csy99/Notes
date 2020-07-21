@@ -37,8 +37,7 @@
 2.	找环首先考虑DFS  
 3. 	递归调用第一步就是判断输入是否合法  
 4.  类似 preorder traversal  
-5.  如果只需要一组解，或者题目保证只有一组解，那么dfs的返回类型可以是boolean，
-这样能减少递归次数。如果题目要求返回所有满足条件的解，那么返回类型应当是void。  
+5.	如果只需要一组解，或者题目保证只有一组解，那么dfs的返回类型可以是boolean，这样能减少递归次数。如果题目要求返回所有满足条件的解，那么返回类型应当是void。  
 ```java
 visited = [false]*|V|;
 
@@ -76,16 +75,15 @@ public void bfs(Node v) {
 
 If tree T is a subgraph of G, and it contains all vertices of G
 设Spanning Tree的顶点和边分别是V'和E'  
-|V'| = |V|  
-|E'| = |V| - 1, E' $\subset$ E  
+
+|V'| = |V|, |E'| = |V| - 1, E' $\subset$ E  
 
 ### 最小生成树 Minimum Spanning Tree
-1.	每一条边都有权重，使权重之后最小 
-Prim's  
-alg: pick a start vertex, treat it as root;  
-	at each iteration, choose lowest weighted edge that connects a vertex without creating any cycles.  
-	本质上是先形成一棵树，慢慢添加节点，向外扩展。   
+每一条边都有权重，使权重之后最小 
+Prim's  alg: pick a start vertex, treat it as root;  at each iteration, choose lowest weighted edge that connects a vertex without creating any cycles.  本质上是先形成一棵树，慢慢添加节点，向外扩展。   
+
 time: O(|E|\*log|V|), binary heap + adjacency list  
+
 ```python
 T = [0]
 cost = 0
@@ -96,13 +94,10 @@ for _ in range(n-1):
 return cost
 ```
 
-Kruskal's  
-alg: add all vertices to MST, sort edges by weights;  
-	at each iteration, add edge with minimum weight that does not create a cycle.  
-	pick a vertex to be root.   
-	本质上是构建一棵树的一部分，最后进行连通，使之成为一棵树。  
-	需要用到并查集的思想。  
+Kruskal's  alg: add all vertices to MST, sort edges by weights;  at each iteration, add edge with minimum weight that does not create a cycle.  pick a vertex to be root.  本质上是构建一棵树的一部分，最后进行连通，使之成为一棵树。需要用到并查集的思想。  
+
 time: O(|E|\*log|V|)  
+
 ```python
 cost = 0
 for _ in range(n-1):
@@ -116,7 +111,8 @@ return cost
 
 ## 拓扑排序 Topological Order
 
-1.	BFS或者DFS都可能是解法 
+BFS或者DFS都可解 
+
 ```java
 public void toporder(List<Node> nodes) {
 	int n = nodes.size(); 

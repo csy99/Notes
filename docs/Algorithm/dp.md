@@ -43,7 +43,7 @@ return dp[m][n]
 ```
 
 
-## depend on uncertain sub-problems
+## split
 
 ```java
 // T(n^3), S(n^2)

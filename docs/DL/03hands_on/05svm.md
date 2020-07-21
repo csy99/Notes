@@ -80,7 +80,7 @@ $\phi_\gamma(x, l)=exp(-\gamma||x-l||^2)$
 
 This is a bell-shaped function varying from 0 (far from landmark) to 1. 
 
-The simplest approach to select the landmarks: create  a landmark at the location of each and every instance in the dataset. The downside is that a training set of size m\*n will be turned to size m\*m (assuming drop the original features).
+The simplest approach to select the landmarks: create a landmark at the location of each and every instance in the dataset. The downside is that a training set of size m\*n will be turned to size m\*m (assuming drop the original features).
 
 ### Gaussian RBF Kernel
 
@@ -140,7 +140,7 @@ The term of $\phi(a)$ includes $x_1^2, \sqrt{2}x_1x_2, x_2^2$. If we apply this 
 
 In ML, a kernel is a function capable of computing the dot product $\phi(a)^T\phi(b)$ based only on the original vectors a and b, without having to compute the transformation. 
 
-Mercer's Theorem: if a  function K(a, b) respects a few mathematical conditions called Mercer's conditions (e.g., K must be continuous and symmetrical: K(a, b) = K(b, a)) then there exists a function $\phi$ that maps a and b into another space (possibly much higher dim) such that K(a, b) = $\phi(a)^T\phi(b)$. We can use K as a kernel even if we do not know what $\phi$ is. 
+Mercer's Theorem: if a function K(a, b) respects a few mathematical conditions called Mercer's conditions (e.g., K must be continuous and symmetrical: K(a, b) = K(b, a)) then there exists a function $\phi$ that maps a and b into another space (possibly much higher dim) such that K(a, b) = $\phi(a)^T\phi(b)$. We can use K as a kernel even if we do not know what $\phi$ is. 
 
 ### Online SVM
 

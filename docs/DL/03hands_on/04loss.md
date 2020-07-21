@@ -23,7 +23,7 @@ This function computes $\hat{\theta} = X^+y$, where $X^+$ is the pseudoinverse o
 
 ### Computational Complexity
 
-The SCD approach used by LinearRegression class is about $O(n^2)$, where n is the number of features. 
+The SVD approach used by LinearRegression class is about $O(n^2)$, where n is the number of features. 
 
 
 
@@ -173,6 +173,8 @@ $\sigma(t) = \frac{1}{1+exp(-t)}$
 
 $cost = -log(\hat{p})$ if y =1. $cost = -log(1-\hat{p})$ if y =0. 
 
+The reason why we are using log loss instead of MSE here is that it is a convex function. In addition, it will give larger updates when the error is larger. 
+
 ### Decision Boundaries
 
 ```python
@@ -181,7 +183,7 @@ iris = datasets.load_iris()
 X = iris["data"][:, 3:]  # petal width
 y = (iris["target"] == 2).astype(np.int)  # 1 if Iris virginica, else 0
 
-X = iris["data"][:, (2, 3)]  # petal length, petal width
+X = iris["data"][:, (2, 3)]  # petal length and width
 y = (iris["target"] == 2).astype(np.int)
 
 log_reg = LogisticRegression(solver="lbfgs", C=10**10, random_state=42)

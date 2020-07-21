@@ -25,13 +25,9 @@ Exploratory Data Analysis (EDA)
 
 太多的精度有可能是噪声。长尾数据可以先进行对数转换，然后截断。
 
-
-
 #### 二值化
 
 标识是否存在。
-
-
 
 #### 分桶
 
@@ -48,8 +44,6 @@ Exploratory Data Analysis (EDA)
 **分位数分桶**
 
 数值变量的取值存在很大间隔时候采用。
-
-
 
 #### 缩放
 
@@ -79,7 +73,7 @@ $x' = \frac{x - min(x)}{max(x) - min(x)}$
 
 **最大绝对值缩放**
 
-将数值范围缩放到 [0, 1] 区间里。
+This estimator scales and translates each feature individually such that the maximal absolute value of each feature in the training set will be 1.0. It does not shift/center the data, and thus does not destroy any sparsity.将数值范围缩放到 [-1, 1] 区间里。
 
 $x' = \frac{x}{|max(x)|}$
 
@@ -93,21 +87,15 @@ $x' = \frac{x}{|max(x)|}$
 
 平方根缩放是方差稳定的变换。
 
-
-
 #### 缺失值处理
 
 补值：均值，中位数，预测缺失值
 
 忽略：将缺失作为一种信息进行编码直接喂给模型
 
-
-
 #### 特征交叉
 
 数值特征之间的相互作用。对多个变量进行加减乘除等操作，在线性模型中引入非线性性质，提升模型表达能力。
-
-
 
 #### 非线性编码
 
@@ -191,13 +179,9 @@ $n_i$是训练集中$x_i$的样本个数。$\lambda(n_i)$用于计算概率值�
 
 构建一个由文档或者短语组成的矩阵，每一行是一个文档，每一列是单词。
 
-
-
 #### 文本清洗
 
 剔除爬虫抓取文本的HTML标记。剔除停止词。统一编码。取出标点符号、数字、空格。还原为词根。
-
-
 
 #### 分词
 
@@ -217,8 +201,6 @@ $n_i$是训练集中$x_i$的样本个数。$\lambda(n_i)$用于计算概率值�
 
 将文本转换成连续序列，包含那个元素。
 
-
-
 #### Skip-Gram模型
 
 ##### 词级模型
@@ -237,13 +219,9 @@ Inverse Document Frequency逆文档频率：单词的重要性随其在语料库
 
 TF-IDF模型是经典的向量空间模型(Vector Space Model)。
 
-
-
 #### 余弦相似度
 
 计算检索词之间的相关性。
-
-
 
 #### Jaccard相似度
 
@@ -251,19 +229,13 @@ TF-IDF模型是经典的向量空间模型(Vector Space Model)。
 
 $J(d_1,d_2) = \frac{d_1 \bigcap d_2}{d_1 \bigcup d_2}$
 
-
-
 #### 编辑距离
 
 Levenshtein。两个字符串由一个转成另外一个所需要的最少操作次数。
 
-
-
 #### 隐形语义分析
 
 把高维向量空间模型表示的文档映射到低维的潜在语义空间。可以使用SVD。
-
-
 
 #### Word2Vec
 
@@ -310,6 +282,24 @@ Levenshtein。两个字符串由一个转成另外一个所需要的最少操作
 
 卡方检验，信息增益，相关系数
 
+Pearson积差相关系数
+
+用于量度两个变量X和Y之间的线性相关。 两个变量分别服从正态分布，通常用t检验检查相关系数的显著性；两个变量的标准差不为0。取值是[-1, +1]，其中1是总正线性相关性，0是非线性相关性，并且-1是总负线性相关性。
+
+​	$\rho_{X,Y} = {\mathrm {cov} (X,Y) \over \sigma _{X}\sigma _{Y}}={E[(X-\mu _{X})(Y-\mu _{Y})] \over \sigma _{X}\sigma _{Y}} = \frac{∑_1^n(X_i−\bar{X})(Y_i−\bar{Y})} {\sqrt{∑_1^n(Xi−\bar{X})^2∑_1^n(Yi−\bar{Y})^2}}$
+
+Spearman秩相关系数
+
+利用两变量的秩次大小作线性相关分析，对原始变量的分布不做要求，属于非参数统计方法。因此它的适用范围比Pearson相关系数要广的多。斯皮尔曼等级相关系数同时也被认为是经过排行的两个随机变量的皮尔逊相关系数，以下实际是计算x、y的皮尔逊相关系数。
+
+![img](https://pic2.zhimg.com/80/v2-fdd4fdb80002ece8d070b828ce900123_1440w.png)
+
+Kendall秩相关系数
+
+是一种秩相关系数，用于反映分类变量相关性的指标，适用于两个变量均为**有序分类**的情况。
+
+![img](https://pic3.zhimg.com/80/v2-2864875581ea4d2ada86b71ceb8275e4_1440w.jpg)
+
 #### 多变量过滤
 
 **优点**
@@ -324,8 +314,6 @@ Levenshtein。两个字符串由一个转成另外一个所需要的最少操作
 **举例**
 
 CFS, MBF, FCBF
-
-
 
 ##### 覆盖率
 
@@ -376,8 +364,6 @@ CFS假设好的特征集合跟目标变量非常相关，但特征之间彼此�
 **举例**
 
 序列向前SFS，序列向后SBE，增q删r，随机爬山，基因算法
-
-
 
 #### 完全搜索
 

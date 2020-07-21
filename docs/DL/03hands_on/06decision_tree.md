@@ -46,11 +46,11 @@ Cost function for classification
 
 $J(k, t_k) = \frac{1}{m}(m_{left}*G_{left}+m_{right}*G_{right})$
 
-It stops recursing once it reaches the maximum depth or if it cannot find a split that will reduce impurity. This is a greedy algorithm: it does not check whether the split will lead to the lowest possible impurity several levels down. 
+It stops recursion once it reaches the maximum depth or if it cannot find a split that will reduce impurity. This is a greedy algorithm: it does not check whether the split will lead to the lowest possible impurity several levels down. 
 
 ### Computational Complexity
 
-Making prediction requires traversing the DT requires roughly $O(log_2(m))$. The training algorithm compares all features on all samples at each other, which results in $O(n*m*log_2(m))$. 
+Making prediction requires traversing the DT requires roughly $O(log_2(m))$. The training algorithm compares all features on all samples at each other, which results in $O(n*m*log_2(m))$. $n$ stands for the number of features, $m$ stands for the number of data samples. 
 
 ### Gini Impurity or Entropy
 

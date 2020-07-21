@@ -1,6 +1,8 @@
 # References
 
 - 《自然语言处理技术在业界的应用实践合集》by DataFunTalk
+- https://zhuanlan.zhihu.com/p/58931044
+- https://zhuanlan.zhihu.com/p/69269702
 
 
 
@@ -8,9 +10,11 @@
 
 ### NNLM
 
-neural probabilistic language model. Bengio, 2003. 
+neural network probabilistic language model. Bengio, 2003. 
 
-简介：三层神经网络模型。用前n-1个词来预测当前词。
+简介：三层神经网络模型。用前n-1个词来预测当前词。该模型会学习到（1）词汇的分布式表达（2）通过学习到的分布式表达构建概率函数。
+
+通过这种方式训练出来的语言模型具有很强的泛化能力，对于训练语料里没有出现过的句子，模型能够通过见过的相似词组成的相似句子来学习。
 
 意义：统一了NLP的特征形式embedding。
 
@@ -20,9 +24,21 @@ neural probabilistic language model. Bengio, 2003.
 
 Mikolov, 2013. 
 
-简介：线性模型。
+简介：线性模型。局部表示（Local Representation）中，每一个元素（如词向量中的一个元素、神经网络中的一个神经元）表示一个实体（词汇）；而在分布式表示（Distributed Representation）中，一个实体（词汇）是由多个元素表征的，同样，一个元素也不仅只涉及到一个实体。基于分布式表示的思想，我们构建一个密集向量（Dense Vector）来表征一个词汇。
+
+CBOW和Skip-gram是Word2vec的两种不同训练方式。CBOW指抠掉一个词，通过上下文预测该词；Skip-gram则与CBOW相反，通过一个词预测其上下文。
 
 意义：不再需要针对特定任务从头训练模型，可以先在大规模预料上进行预训练，再迁移。
+
+
+
+### FastText
+
+Mikolov, 2016.
+
+简介：与CBOW模型相似，但有所不同：各个词的embedding向量，补充字级别的n-gram特征向量，然后将这些向量求和平均，用基于霍夫曼树的分层softmax函数，输出对应的类别标签。
+
+引入subword n-gram的概念解决词态变化的问题，利用字级别的n-gram信息捕获字符间的顺序关系，依次丰富单词内部更细微的语义；二是用基于霍夫曼树的分层softmax函数，将计算复杂度从O(kh)降低到O(h log2(k))，其中，k是类别个数，h是文本表示的维数。 
 
 
 
@@ -38,7 +54,7 @@ Vaswani, 2017.
 
 2. feed-forward network
 
-   通过多头注意力后，经过一个NN，增加网络非线性。添加了像resNet一样的shortcut连接。
+   通过多头注意力后，经过一个NN，增加网络非线性。添加了像resNet一样的shortcut连接。为了更好地优化深度网络，每个子层都加了残差连接并归一化处理。
 
 3. position encoding
 

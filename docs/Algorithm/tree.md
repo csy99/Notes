@@ -17,21 +17,23 @@ public Node solve(Node root) {
 
 ## two roots
 ```java
-public Node solve(Node p, Node q) {
+public boolean solve(Node p, Node q) {
 	if (p == null && q == null) 
 		return True;
 	if (p == null || q == null) 
 		return false;
 	if (p.val != q.val)
 		return false;
-	Node l = solve(p.left, q.left);
-	Node r = solve(p.right, q.right);
+	boolean l = solve(p.left, q.left);
+	boolean r = solve(p.right, q.right);
 	return l && r;
 }
 ```
 
 
+
 # 前缀树 Trie
+
 1.	终点节点的处理（这里的终点节点并不一定是叶子节点）
 ```java
 class TrieNode {  
@@ -44,7 +46,10 @@ class TrieNode {
 }  
 ```
 
+
+
 # 树状数组/二元索引树 Binary Indexed Tree
+
 ``` java
 class BIT {
     int[] sum;
@@ -70,7 +75,10 @@ class BIT {
 }
 ```
 
+
+
 # 线段树 Segment Tree
+
 1.	Each leaf node represents an element in the array. 
 Each non leaf node covers the union of its children's range.
 
