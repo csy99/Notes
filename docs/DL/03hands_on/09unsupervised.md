@@ -54,7 +54,7 @@ If we have a high dimensional dataset, we end up with a k-dim dataset.
 
 #### Alg
 
-The computational complexity is generally linear with respect to the number of instances m, the number of clusters k, and the number of dimensions n, if data has a clustering structure. 
+The computational complexity is generally linear with respect to the number of instances m, the number of clusters k, and the number of dimensions n, if data has a clustering structure. Complexity if O(m\*n\*k*l). l is number of iteration. 
 
 #### Centroid Init
 
@@ -346,7 +346,7 @@ We want to start by estimating the weights $\Phi$ and all the distribution param
 from sklearn.mixture import GaussianMixture
 gm = GaussianMixture(n_components=3, n_init=10)
 gm.fit(X)
-gm.weghts_
+gm.weights_
 gm.means_
 gm.covariances_
 ```

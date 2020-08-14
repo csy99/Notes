@@ -29,9 +29,9 @@ def generate_time_series(batch_size, n_steps):
     freq1, freq2, offset1, offset2 = np.random.rand(4, batch_size, 1)
     time = np.linspace(0, 1, n_steps)
     series = 0.5 * np.sin((time-offset1)*(freq1*10+10))
-    series = 0.2 * np.sin((time-offset2)*(freq2*10+20))
-    series = 0.1 * (np.random.rand(batch_size, n_steps)-0.5)
-    return series[...,npnewaxis].astype(np.float32)
+    series += 0.2 * np.sin((time-offset2)*(freq2*10+20))
+    series += 0.1 * (np.random.rand(batch_size, n_steps)-0.5)
+    return series[...,np.newaxis].astype(np.float32)
 ```
 
 The input features are generally represented as 3D arrays [batch size, time steps, dimensionality]. 
@@ -275,7 +275,7 @@ hist = model.fit(xtrian, ytrain[:, 3::2], epochs=20, validation_data=(xval, yval
 
 Stacked 1D conv layers, doubling the dilation rate at every layer. This way, the lower layers learn short term patterns, while the higher layers learn long term patterns. 
 
-In WaveNet paper, they stacked 10 conv layers with dilation rates 0f 1~512, then repeat 3 such blocks. 
+In WaveNet paper, they stacked 10 conv layers with dilation rates of 1~512, then repeat 3 such blocks. 
 
 ```python
 model = Sequential()

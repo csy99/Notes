@@ -159,7 +159,7 @@ Similar to LeNet-5, but larger and deeper. The first to stack conv layers direct
 
 <img src="./pics/1402.PNG" height="300" width="500">
 
-To reduce overfitting, the authors used to reg tech. First, they applied dropout during training to the outputs of layers F9 and F10. Second, they performed data augmentation by randomly shifting the training images by various offset, flipping and changing the lighting conditions. 
+To reduce overfitting, the authors used reg tech. First, they applied dropout during training to the outputs of layers F9 and F10. Second, they performed data augmentation by randomly shifting the training images by various offset, flipping and changing the lighting conditions. 
 
 **data aug**
 
@@ -217,11 +217,11 @@ Architecture: 2 or 3 conv layers and a pooling layer, then again 2 or 3 conv lay
 
 It confirmed the general trend: models are getting deeper and deeper, with fewer and fewer params. The key is to use skip connections. 
 
-When training a neural network, the goal is target function h(x). If you add the input x to the output of the network, then the network will be forced to model f(x) =h(x) - x rather than h(x). This is called residual learning. If the target function is fairly close to the identity function (which is often the case), this will speed up training considerably.  
+When training a neural network, the goal is target function h(x). If you add the input x to the output of the network, then the network will be forced to model f(x) = h(x) - x rather than h(x). This is called residual learning. If the target function is fairly close to the identity function (which is often the case), this will speed up training considerably.  
 
 <img src="./pics/1405.PNG" height="200" width="400">
 
-Moreover, if we add many skip connections, the network can start making progress even if several layers have not started learning yet. The deep residual network can be seen as a stack  of residual units(RUs), where each RU is a small NN with a skip connection. 
+Moreover, if we add many skip connections, the network can start making progress even if several layers have not started learning yet. The deep residual network can be seen as a stack of residual units(RUs), where each RU is a small NN with a skip connection. 
 
 Each RU is composed of two conv layers (no pooling), with Batch Normalization and ReLU activation, using 3\*3 and preserving spatial dimensions. 
 
@@ -419,7 +419,7 @@ model = keras.Model(inputs=base_model.input, outputs=[class_output, loc_output])
 model.compile(loss=["sparse_categorical_crossentropy", "mse"], loss_weights=[0.8,0.2], optimizer=optm, metrics=["accuracy"])
 ```
 
-Sometimes, the dataset does not have bounding boxes, and we need to add them ourselves. We can use an open source image labeling tool like VGG Image ANnotator, LabelImg, OpenLabeler, or ImgLab. 
+Sometimes, the dataset does not have bounding boxes, and we need to add them ourselves. We can use an open source image labeling tool like VGG Image Annotator, LabelImg, OpenLabeler, or ImgLab. 
 
 Each item should be a tuple of the form (images, (class_labels, bounding_boxes)). The bounding boxes should be normalized so that the horizontal and vertical coordinates range from 0 to 1. Also, it is common to predict the sqrt of the height and width rather than the height and width directly: this way, a 10 pixel error for a large bounding box will not be penalized as much as a 10 pixel error for a small bounding box. 
 

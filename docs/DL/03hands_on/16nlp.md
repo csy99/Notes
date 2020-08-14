@@ -129,7 +129,8 @@ model = Sequential([
        batch_input_shape=[batch_size, None, max_id]),
     GRU(128, return_sequences=True, stateful=True, 
        dropout=0.2, recurrent_dropout=0.2, 
-       batch_input_shape=[batch_size, None, max_id]),     TimeDistributed(Dense(max_id, activation="sm"))
+       batch_input_shape=[batch_size, None, max_id]),
+    TimeDistributed(Dense(max_id, activation="sm"))
 ])
 ```
 
@@ -154,10 +155,8 @@ Preprocessing.
 ```python
 def prep(x, y):
     x = tf.strings.substr(x, 0, 300)
-    x = tf.strings.regex_replace(x, b"<br\\s*/?>",
-                                 b" ")
-    x = tf.strings.regex_replace(x, b"[^a-zA-Z']", 
-                                b" ")
+    x = tf.strings.regex_replace(x, b"<br\\s*/?>", b" ")
+    x = tf.strings.regex_replace(x, b"[^a-zA-Z']", b" ")
     x = tf.strings.split(x)
     return x.to_tensor(default_value=b"<pad>"), y
 ```
@@ -322,7 +321,7 @@ decoder = tfa.seq2seq.beam_search_decoder.BeamSearchDecoder(
 cell=decoder_cell, beam_width=beam_width, output_layer=output_layer)
 decoder_initial_state = tfa.seq2seq.beam_search_decoder.tile_batch(encoder_state, multiplier=beam_width)
 outputs, _, _ = decoder(embedding_decoder, 
-        start_tokens=start_tokens,end_token=end_token, 
+        start_tokens=start_tokens, end_token=end_token, 
         initial_staet=decoder_inital_state)
 
 ```

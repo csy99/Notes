@@ -37,7 +37,7 @@ c1 = Vt.T[:, 0]
 c2 = Vt.T[:, 1]
 ```
 
-PCA assumes that dataset is centered around the origin. Scikit-learn's PCA classes take care of this. 
+PCA assumes that dataset is centered around the origin. Scikit-learn's PCA classes take care of this. Complexity if O(n^3) where n is the number of features. 
 
 ### Project
 
@@ -96,7 +96,7 @@ X_recovered = pca.inverse_transform(X_reduced)
 
 ### Randomized PCA
 
-scikit learn  can use a stochastic algorithm called Randomized PCA that quickly finds an approximation of the first d principal components. Its computational complexity is $O(m*d^2) + O(d^3)$ rather than  $O(m*n^2) + O(n^3)$. 
+scikit learn use a stochastic algorithm called Randomized PCA that quickly finds an approximation of the first d principal components. Its computational complexity is $O(m*d^2) + O(d^3)$ rather than  $O(m*n^2) + O(n^3)$. 
 
 ```python
 rnd_pca = PCA(n_components=154, svd_solver="randomized")
@@ -106,7 +106,7 @@ By default, the mode is "auto". If m or n is greater than 500, and d is less tha
 
 ### Incremental PCA
 
-The preceding implementations of PCA requires the whole training set to fir in memory in order for the alg to run. Using IPCA, we can split the training set into mini-batches. This is useful for large training sets and for applying PCA online. 
+The preceding implementations of PCA requires the whole training set to fit in memory in order for the alg to run. Using IPCA, we can split the training set into mini-batches. This is useful for large training sets and for applying PCA online. 
 
 ```python
 from sklearn.decomposition import IncrementalPCA
