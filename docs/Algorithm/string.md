@@ -14,7 +14,7 @@ Given a string *s* and a pattern *p*, find all occurrences of *p* in *s*.
 
 n = len(s), m = len(p)
 
-brute force**
+**brute force**
 
 time: worst O(mn), average O(m+n)
 

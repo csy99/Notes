@@ -1853,3 +1853,2002 @@ public class Client {
 
 
 
+## 行为型模式
+
+### 模板模式 Template Method Pattern
+
+在抽象类定义了执行他的方法的模板，子类可以按需要重写。
+
+AbstractClass 抽象类， 类中实现了模板方法(template)，定义了算法的骨架，具体子类需要去实现 其它的抽象方法。 ConcreteClass 实现抽象方法，以完成算法中特点子类的步骤。一般模板方法都加上 final 关键字， 防止子类重写模板方法。
+
+在Spring IOC容器中`ConfigurableApplicationContext.class`的refresh()方法有使用模板模式。
+
+**优点**
+
+1. 实现了最大化代码复用。父类的模板方法和已实现的某些步骤会被子类继承而直接使用。
+2. 统一了算法，也提供了很大的灵活性。
+
+**缺点**
+
+1. 每一个不同的实现都需要一个子类实现，导致类的个数增加，使得系统更加庞大
+
+```java
+public class Client {
+    public static void main(String[] args) {
+        System.out.println("----制作红豆豆浆----");
+        SoyaMilk redBeanSoyaMilk = new RedBeanSoyaMilk(); 
+        redBeanSoyaMilk.make();
+
+        System.out.println("----制作花生豆浆----"); 
+        SoyaMilk peanutSoyaMilk = new PeanutSoyaMilk(); 	
+        peanutSoyaMilk.make();
+    }
+}
+
+public class PeanutSoyaMilk extends SoyaMilk {
+    @Override
+    void addCondiments() {
+    	System.out.println(" 加入上好的花生 ");
+    }
+}
+
+public class RedBeanSoyaMilk extends SoyaMilk {
+    @Override
+    void addCondiments() {
+    	System.out.println(" 加入上好的红豆 ");
+    }
+}
+
+//抽象类，表示豆浆
+public abstract class SoyaMilk {
+
+    //模板方法, make , 模板方法可以做成 final , 不让子类去覆盖. 
+    final void make() {
+    	select(); 
+        addCondiments(); 
+        soak();
+    	beat();
+    }
+
+    //选材料
+    void select() {
+    	System.out.println("第一步：选择好的新鲜黄豆");
+    }
+
+    //添加不同的配料，抽象方法，子类具体实现
+    abstract void addCondiments();
+
+    //浸泡
+    void soak() {
+    	System.out.println("第三步，黄豆和配料开始浸泡，需要3小时");
+    }
+
+
+    void beat() {
+    	System.out.println("第四步：黄豆和配料放到豆浆机去打碎");
+    }
+}
+```
+
+在模板方法模式的父类中，我们可以定义一个方法，它默认不做任何事，子类可以视情况要不要覆盖它，该方法称为”钩子“。 还是用上面做豆浆的例子来讲解，我们还希望制作纯豆浆，不添加任何的配料，使用钩子方法对模板方法进行改造。
+
+2)       ConcreteClass 实现抽象方法 operationr2,3,4, 以完成算法中特点子类的步骤
+
+```java
+public class PureSoyaMilk extends SoyaMilk {
+    @Override
+    void addCondiments() {
+    	
+    }
+    
+    boolean wantCondiment() {
+        return false;
+    }
+}
+
+//抽象类，表示豆浆
+public abstract class SoyaMilk {
+
+    //模板方法, make , 模板方法可以做成 final , 不让子类去覆盖. 
+    final void make() {
+    	select(); 
+        if (wantCondiment())
+        	addCondiments(); 
+        soak();
+    	beat();
+    }
+
+    //选材料
+    void select() {
+    	System.out.println("第一步：选择好的新鲜黄豆");
+    }
+
+    //添加不同的配料，抽象方法，子类具体实现
+    abstract void addCondiments();
+
+    //浸泡
+    void soak() {
+    	System.out.println("第三步，黄豆和配料开始浸泡，需要3小时");
+    }
+
+
+    void beat() {
+    	System.out.println("第四步：黄豆和配料放到豆浆机去打碎");
+    }
+    
+    boolean wantCondiment() {
+        return true;
+    }
+}
+```
+
+### 命令模式 Command Pattern
+
+在软件设计中，我们经常需要向某些对象发送请求，但是并不知道请求的接收者是谁，也不知道被请求的操作是哪个。
+
+<img src="./pics/11design_command.jpg">
+
+1)   Invoker 是调用者角色
+
+2)   Command: 是命令角色，需要执行的所有命令都在这里，可以是接口或抽象类
+
+3)   Receiver: 接受者角色，知道如何实施和执行一个请求相关的操作
+
+4)   ConcreteCommand: 将一个接受者对象与一个动作绑定，调用接受者相应的操作，实现 execute
+
+在Spring框架JdbcTemplate中有应用。`Interface StatementCallback<T>`类似Command。`class QueryStatementCallback implements StatementCallback<T>, SqlProvider `， 局部内部类，实现了命令接口， 同时也充当命令接收者。命令调用者 是 JdbcTemplate , 其中 `execute(StatementCallback<T> action)`方法中，调用 `action.doInStatement ()`方法。不同的实现 StatementCallback 接口的对象，对应不同的 doInStatemnt 实现逻辑。
+
+**优点**
+
+1. 请求发送者与请求接收者消除彼此之间的耦合，让对象之间的调用关系更加灵活，实现解耦。
+2. 容易设计一个命令队列。只要把命令对象放到列队，就可以多线程的执行命令
+3. 容易实现对请求的撤销和重做
+
+**缺点**
+
+1. 有过多的具体命令类，增加了系统的复杂度
+
+```java
+public class Client {
+    public static void main(String[] args) {
+        //使用命令设计模式，完成通过遥控器，对电灯的操作
+        //创建电灯的对象(接受者)
+        LightReceiver lightReceiver = new LightReceiver();
+        //创建电灯相关的开关命令
+        LightOnCommand lightOnCommand = new LightOnCommand(lightReceiver);
+        LightOffCommand lightOffCommand = new LightOffCommand(lightReceiver);
+
+        //需要一个遥控器
+        RemoteController remoteController = new RemoteController();
+
+        //给我们的遥控器设置命令, 比如no = 0是电灯的开和关的操作
+        remoteController.setCommand(0, lightOnCommand, lightOffCommand);
+
+    	System.out.println("--------按下灯的开按钮-----------"); 
+        remoteController.onButtonWasPushed(0); 	
+        System.out.println("--------按下灯的关按钮-----------"); 
+        remoteController.offButtonWasPushed(0); 
+        System.out.println("--------按下撤销按钮-----------"); 
+        remoteController.undoButtonWasPushed();
+
+    	System.out.println("=========使用遥控器操作电视机=========="); 
+        TVReceiver tvReceiver = new TVReceiver();
+    	TVOffCommand tvOffCommand = new TVOffCommand(tvReceiver); 
+        TVOnCommand tvOnCommand = new TVOnCommand(tvReceiver);
+    	//给我们的遥控器设置命令, 比如 no = 1  是电视机的开和关的操作
+    	remoteController.setCommand(1, tvOnCommand, tvOffCommand);
+
+    	System.out.println("--------按下电视机的开按钮-----------");
+    	remoteController.onButtonWasPushed(1); 
+        System.out.println("--------按下电视机的关按钮-----------"); 
+        remoteController.offButtonWasPushed(1); 
+        System.out.println("-------- 按下撤销按钮 -----------"); 
+        remoteController.undoButtonWasPushed();
+    }
+}
+
+//创建命令接口
+public interface Command {
+	//执行动作(操作) 
+    public void execute();
+	//撤销动作(操作) 
+    public void undo();
+}
+
+public class LightOffCommand implements Command {
+	// 聚合LightReceiver 
+    LightReceiver light;
+	// 构造器
+    public LightOffCommand(LightReceiver light) { 
+        super();
+    	this.light = light;
+    }
+
+    @Override
+    public void execute() {
+        // 调用接收者的方法
+        light.off();
+    }
+
+    @Override
+    public void undo() {
+        // 调用接收者的方法
+        light.on();
+    }
+}
+
+public class LightOnCommand implements Command {
+    //聚合LightReceiver 
+    LightReceiver light;
+    //构造器
+    public LightOnCommand(LightReceiver light) { 
+        super();
+    	this.light = light;
+    }
+
+
+    @Override
+    public void execute() {
+    	//调用接收者的方法 
+        light.on();
+    }
+
+    @Override
+    public void undo() {
+        //调用接收者的方法
+        light.off();
+    }
+}
+
+
+public class LightReceiver {
+    public void on() {
+    	System.out.println(" 电灯打开了.. ");
+    }
+
+    public void off() {
+    	System.out.println(" 电灯关闭了.. ");
+    }
+}
+
+/**
+ *没有任何命令，即空执行: 用于初始化每个按钮, 当调用空命令时，对象什么都不做
+ *其实，这也是一种设计模式, 可以省掉对空判断
+ */
+public class NoCommand implements Command {
+    @Override
+    public void execute() {}
+
+    @Override
+    public void undo() {}
+}
+
+public class RemoteController {
+	Command[] onCommands; 
+    Command[] offCommands;
+	// 执行撤销的命令
+	Command undoCommand;
+
+    // 构造器，完成对按钮初始化
+    public RemoteController() {
+    	onCommands = new Command[5]; 
+        offCommands = new Command[5];
+        for (int i = 0; i < 5; i++) {
+        	onCommands[i] = new NoCommand(); 
+            offCommands[i] = new NoCommand();
+        }
+    }
+
+    // 给我们的按钮设置你需要的命令
+    public void setCommand(int no, Command onCommand, Command offCommand) { 
+        onCommands[no] = onCommand;
+    	offCommands[no] = offCommand;
+    }
+
+    // 按下开按钮
+    public void onButtonWasPushed(int no) { 
+        // 找到你按下的开的按钮， 并调用对应方法
+        onCommands[no].execute();
+        // 记录这次的操作，用于撤销
+        undoCommand = onCommands[no];
+	}
+
+    // 按下开按钮
+    public void offButtonWasPushed(int no) { 
+        // 找到你按下的关的按钮， 并调用对应方法
+        offCommands[no].execute();
+        // 记录这次的操作，用于撤销
+        undoCommand = offCommands[no];
+    }
+
+    // 按下撤销按钮
+    public void undoButtonWasPushed() { 
+        undoCommand.undo();
+    }
+}
+
+
+public class TVOffCommand implements Command {
+    // 聚 合 TVReceiver
+    TVReceiver tv;
+
+    // 构造器
+    public TVOffCommand(TVReceiver tv) { 
+        super();
+    	this.tv = tv;
+    }
+
+    @Override
+    public void execute() {
+        // 调用接收者的方法
+        tv.off();
+    }
+
+    @Override
+    public void undo() {
+        // 调用接收者的方法
+        tv.on();
+    }
+}
+
+public class TVOnCommand implements Command {
+	// 聚 合 TVReceiver TVReceiver tv;
+	// 构造器
+	public TVOnCommand(TVReceiver tv) { 
+        super();
+        this.tv = tv;
+    }
+
+    @Override
+    public void execute() {
+    	tv.on();
+    }
+
+    @Override
+    public void undo() {
+    // 调用接收者的方法
+    tv.off();
+    }
+}
+
+public class TVReceiver {
+    public void on() {
+    	System.out.println(" 电视机打开了.. ");
+    }
+
+    public void off() {
+    	System.out.println(" 电视机关闭了.. ");
+    }
+}
+
+```
+
+### 访问者模式 Visitor Pattern
+
+封装一些作用于某种数据结构的各元素的操作，它可以在不改变数据结构的前提下定义作用于这些元素的新的操作。包含访问者和被访问元素两个主要组成部分，这些被访问的元素通常具有不同的类型，且不同的访问者可以对它们进行不同的访问操作。例如：处方单中的各种药品信息就是被访问的元素，而划价人员和药房工作人员就是访问者。
+
+1)    Visitor 是抽象访问者，为该对象结构中的 ConcreteElement 的每一个类声明一个 visit 操作
+
+2)    ConcreteVisitor ：是一个具体的访问值实现每个有 Visitor 声明的操作，是每个操作实现的部分。
+
+3)    ObjectStructure 能枚举它的元素， 可以提供一个高层的接口，用来允许访问者访问元素
+
+4)    Element 定义一个 accept 方法，接收一个访问者对象
+
+5)    ConcreteElement 为具体元素，实现了 accept 方法
+
+双分派：不管类怎么变化，我们都能找到期望的方法运行。执行的操作取决于请求的种类和两个接受者的类型。
+
+**优点**
+
+1. 符合单一职责原则，程序扩展性好
+2. 对功能进行统一，适用于数据结构稳定的系统，应用场景有报表、UI、拦截器
+
+**缺点**
+
+1. 具体元素对访问者公布细节，违反了迪米特法则
+2. 违背了依赖倒转原则
+
+```java
+public abstract class Action {
+    //得到男性 的测评
+    public abstract void getManResult(Man man);
+    //得到女的 测评
+    public abstract void getWomanResult(Woman woman);
+}
+
+public abstract class Person {
+	//提供一个方法，让访问者可以访问
+    public abstract void accept(Action action);
+}
+
+//说明
+//1. 这里我们使用到了双分派,  即首先在客户端程序中，将具体状态作为参数传递 Woman中(第一次分派)
+//2. 然后 Woman 类调用作为参数的 "具体方法" 中方法 getWomanResult, 同时将自己(this)作为参数传入，完成第二次的分派
+public class Woman extends Person{
+    @Override
+    public void accept(Action action) {
+        action.getWomanResult(this);
+    }
+}
+
+public class Man extends Person {
+    @Override
+    public void accept(Action action) {
+        action.getManResult(this);
+    }
+}
+
+public class Success extends Action {
+    @Override
+    public void getManResult(Man man) {
+    	System.out.println(" 男人给的评价该歌手很成功 !");
+    }
+
+    @Override
+    public void getWomanResult(Woman woman) { 
+        System.out.println(" 女人给的评价该歌手很成功 !");
+    }
+}
+
+public class Fail extends Action {
+    @Override
+    public void getManResult(Man man) {
+    	System.out.println(" 男人给的评价该歌手失败 !");
+    }
+
+
+    @Override
+    public void getWomanResult(Woman woman) {
+    	System.out.println(" 女人给的评价该歌手失败 !");
+    }
+}
+
+public class Wait extends Action {
+    @Override
+    public void getManResult(Man man) {
+        System.out.println(" 男人给的评价是该歌手待定 ..");
+    }
+
+
+    @Override
+    public void getWomanResult(Woman woman) {
+        System.out.println(" 女人给的评价是该歌手待定 ..");
+    }
+}
+
+//数据结构，管理很多人（Man , Woman） 
+public class ObjectStructure {
+    //维护了一个集合
+    private List<Person> persons = new LinkedList<>();
+
+    //增加到 list
+    public void attach(Person p) {
+    	persons.add(p);
+    }
+    
+    //移除
+    public void detach(Person p) { 
+        persons.remove(p);
+    }
+
+    //显示测评情况
+    public void display(Action action) { 
+        for(Person p: persons) 
+    		p.accept(action);
+    }
+}
+
+public class Client {
+    public static void main(String[] args) {
+        //创建 ObjectStructure
+        ObjectStructure objectStructure = new ObjectStructure();
+        objectStructure.attach(new Man()); 	
+        objectStructure.attach(new Woman());
+        System.out.println("==============="); 
+        Success success = new Success(); 	
+        objectStructure.display(success);
+    	System.out.println("==============="); 
+        Fail fail = new Fail(); 
+        objectStructure.display(fail);
+        System.out.println("=======给的是待定的测评========");
+        Wait wait = new Wait(); 
+        objectStructure.display(wait);
+    }
+}
+```
+
+### 迭代器模式 Iterator Pattern
+
+提供一种遍历集合元素的统一接口，用一致的方法遍历集合元素，不需要知道集合对象的底层表示，即：不暴露其内部的结构。
+
+<img src="./pics/12design_iter.jpg">
+
+1)	Iterator：迭代器接口，是系统提供，含有 hasNext, next, remove
+2)	ConcreteIterator:  具体的迭代器类，管理迭代
+3)	Aggregate: 一个统一的聚合接口， 将客户端和具体聚合解耦
+4)	ConcreteAggreage：具体的聚合持有对象集合， 并提供一个方法，返回一个迭代器， 该迭代器可以正确遍历集合
+5)	Client：客户端，通过Iterator和Aggregate依赖子类
+
+在JDK中ArrayList集合中有应用。内部类Itr充当具体实现迭代器的类。List充当了聚合接口，含有iterator()方法。ArrayList实现了List接口，实现了iterator()方法。
+
+**优点**
+
+1. 解决了不同集合的遍历问题
+2. 隐藏了聚合的内部结构
+3. 把管理对象集合和遍历对象集合的责任分开，符合单一责任模式
+
+**缺点**
+
+1. 每个聚合对象都要有一个迭代器，存在类爆炸问题
+
+```java
+public class ComputerCollegeIterator implements Iterator {
+    //这里我们需要 Department以数组方式存放
+    Department[] departments;
+    int position = 0; //遍历的位置
+    public ComputerCollegeIterator(Department[] departments) { 
+        this.departments = departments;
+    }
+
+    //判断是否还有下一个元素 
+    @Override
+    public boolean hasNext() {
+    if(position >= departments.length || departments[position] == null) 
+        return false;
+    else 
+    	return true;
+    }
+
+    @Override
+    public Object next() {
+        Department department = departments[position]; 
+        position += 1;
+    	return department;
+    }
+
+	//删除的方法，默认空实现 
+    public void remove() {}
+}
+
+public class InfoColleageIterator implements Iterator {
+	List<Department> departmentList; //信息工程学院是以 List 方式存放系
+	int index = -1;//索引
+
+    public InfoColleageIterator(List<Department> departmentList) { 
+        this.departmentList = departmentList;
+    }
+
+    @Override
+    public boolean hasNext() {
+        if(index >= departmentList.size() - 1) 
+    		return false;
+    	else {
+    		index += 1; 
+            return true;
+    	}
+    }
+
+    @Override
+    public Object next() {
+        return departmentList.get(index);
+    }
+
+    // 空 实 现
+	public void remove() {}
+}
+
+public interface College {
+    public String getName();
+
+    //增加系的方法
+    public void addDepartment(String name, String desc);
+
+    //返回一个迭代器,遍历
+    public Iterator	createIterator();
+}
+
+public class ComputerCollege implements College {
+    Department[] departments;
+    int numOfDepartment = 0 ;// 保存当前数组的对象个数
+    public ComputerCollege() { 
+        departments = new Department[5];
+        addDepartment("Java 专业", " Java 专业  ");
+        addDepartment("PHP 专业", " PHP 专业  ");
+        addDepartment("大数据专业", "  大数据专业 ");
+	}
+
+    @Override
+    public String getName() {
+    	return "计算机学院";
+    }
+
+    @Override
+    public void addDepartment(String name, String desc) {
+    	Department department = new Department(name, desc); 
+        departments[numOfDepartment++] = department; 
+    }
+
+    @Override
+    public Iterator createIterator() {
+    	return new ComputerCollegeIterator(departments);
+    }
+}
+
+public class InfoCollege implements College {
+    List<Department> departmentList;
+
+    public InfoCollege() {
+    	departmentList = new ArrayList<Department>();
+        addDepartment("信息安全专业", " 信息安全专业 "); 	
+        addDepartment("网络安全专业", " 网络安全专业 ");
+    	addDepartment("服务器安全专业", "  服务器安全专业 ");
+    }
+    
+    @Override
+    public String getName() {
+    	return "信息工程学院";
+    }
+
+    @Override
+    public void addDepartment(String name, String desc) {
+    	Department department = new Department(name, desc); 	
+        departmentList.add(department);
+    }
+
+    @Override
+    public Iterator createIterator() {
+    	return new InfoColleageIterator(departmentList);
+    }
+}
+
+//系
+public class Department {
+    private String name; 
+    private String desc;
+    public Department(String name, String desc) {
+    	super();
+    	this.name = name; 
+        this.desc = desc;
+    }
+    
+    public String getName() { return name;}
+    public void setName(String name) { this.name = name;}
+    public String getDesc() { return desc;}
+    public void setDesc(String desc) { this.desc = desc;}
+}
+
+public class OutPutImpl {
+    //学院集合
+    List<College> collegeList;
+    public OutPutImpl(List<College> collegeList) {
+        this.collegeList = collegeList;
+    }
+    
+    //遍历所有学院,然后调用 printDepartment  输出各个学院的系
+    public void printCollege() {
+    	//从 collegeList 取出所有学院, Java 中的 List 已经实现 Iterator 
+        Iterator<College> iterator = collegeList.iterator();
+        while(iterator.hasNext()) {
+            //取出一个学院
+            College college = iterator.next();
+            System.out.println("===="+college.getName()+"====" ); 
+            printDepartment(college.createIterator()); 
+        }
+    }
+    
+    //输出学院,输出系
+    public void printDepartment(Iterator iterator) { 
+        while(iterator.hasNext()) {
+    		Department d = (Department)iterator.next(); 		
+            System.out.println(d.getName());
+    	}
+    }
+}
+
+public class Client {
+    public static void main(String[] args) {
+        //创建学院
+        List<College> collegeList = new ArrayList<College>();
+        ComputerCollege computerCollege = new ComputerCollege(); 
+        InfoCollege infoCollege = new InfoCollege();
+
+        collegeList.add(computerCollege);
+        collegeList.add(infoCollege);
+        OutPutImpl outPutImpl = new OutPutImpl(collegeList); 
+        outPutImpl.printCollege();
+    }
+}
+```
+
+### 观察者模式
+
+对象之间多对一依赖的一种设计方案，被依赖的对象为 Subject，依赖的对象为 Observer，Subject
+通知 Observer 变化。比如这里的奶站是 Subject，是 1 的一方。用户时是Observer，是多的一方。
+
+被观察者(subject)需要至少三个操作：添加观察者，删除观察者，通知观察者。观察者(observer)需要有一个更新的操作。
+
+在JDK源码中`class Observerable`有应用，作用相当于Subject，是一个类，通过集成来实现观察者模式。`Observer`的作用相当于Observer。
+
+**优点**
+
+1. 以集合的方式管理观察者，增加观察者不需要修改核心类代码，符合ocp原则
+
+**缺点**
+
+1. 
+
+```java
+//接口, 让 WeatherData 来实现
+public interface Subject {
+	public void registerObserver(Observer o); 
+    public void removeObserver(Observer o); 
+    public void notifyObservers();
+}
+
+/**
+ *	类是核心
+ *	1. 包含最新的天气情况信息
+ *	2. 含有 观察者集合，使用 ArrayList 管理
+ *	3.  当数据有更新时，就主动的调用	ArrayList, 通知所有的（接入方）就看到最新的信息
+ */
+public class WeatherData implements Subject { 
+    private float temperatrue;
+	private float pressure;
+    private float humidity;
+    private ArrayList<Observer> observers; //观察者集合
+    
+    public WeatherData() {
+    	observers = new ArrayList<Observer>();
+    }
+
+    public float getTemperature() { return temperatrue;}
+    public float getPressure() { return pressure;}
+    public float getHumidity() { return humidity;}
+    
+    public void dataChange() {
+    	//调用接入方的 update
+    	notifyObservers();
+    }
+
+    //当数据有更新时，就调用 setData
+    public void setData(float temperature, float pressure, float humidity) { 
+        this.temperatrue = temperature;
+    	this.pressure = pressure; this.humidity = humidity;
+   		//调用dataChange，将最新的信息推送给接入方currentConditions
+    	dataChange();
+	}
+
+    //注册一个观察者 
+    @Override
+    public void registerObserver(Observer o) {
+        observers.add(o);
+    }
+
+    //移除一个观察者 
+    @Override
+    public void removeObserver(Observer o) {
+    	observers.remove(o);
+	}
+
+    //遍历所有的观察者，并通知 
+    @Override
+    public void notifyObservers() {
+        for(int i = 0; i < observers.size(); i++) 
+            observers.get(i).update(temperatrue, pressure, humidity);
+    }
+
+}
+
+//观察者接口，有观察者来实现 
+public interface Observer {
+    public void update(float temperature, float pressure, float humidity);
+}
+
+public class CurrentConditions implements Observer {
+	// 温度，气压，湿度
+	private float temperature;
+    private float pressure; private float humidity;
+
+    // 更新 天气情况，是由 WeatherData 来调用，我使用推送模式
+    public void update(float temperature, float pressure, float humidity) { 
+        this.temperature = temperature;
+    	this.pressure = pressure; 
+        this.humidity = humidity; 
+        display();
+    }
+
+    // 显 示
+    public void display() {
+    	System.out.println("***Today mTemperature: " + temperature + "***"); 
+        System.out.println("***Today mPressure: " + pressure + "***"); 
+        System.out.println("***Today mHumidity: " + humidity + "***");
+    }
+}
+
+public class BaiduSite implements Observer {
+	// 温度，气压，湿度
+    private float temperature; 
+    private float pressure; 
+    private float humidity;
+
+    //  更新天气情况，是由  WeatherData  来调用，我使用推送模式
+    public void update(float temperature, float pressure, float humidity) {
+        this.temperature = temperature;
+        this.pressure = pressure; 
+        this.humidity = humidity; 
+        display();
+    }
+
+    // 显 示
+    public void display() {
+        System.out.println("===百度网站====");
+        System.out.println("***百度网站 气温 : " + temperature + "***");
+        System.out.println("***百度网站 气压: " + pressure + "***");
+        System.out.println("***百度网站 湿度: " + humidity + "***");
+    }
+}
+
+public class Client {
+    public static void main(String[] args) {
+        //创建一个 WeatherData
+        WeatherData weatherData = new WeatherData();
+        //创建观察者
+        CurrentConditions currentConditions = new CurrentConditions();
+        BaiduSite baiduSite = new BaiduSite();
+        // 注 册 到 weatherData 
+        weatherData.registerObserver(currentConditions); 
+        weatherData.registerObserver(baiduSite);
+
+        // 测试                                                         
+        System.out.println("通知各个注册的观察者, 看看信息"); 
+        weatherData.setData(10f, 100f, 30.3f);
+        weatherData.removeObserver(currentConditions);
+        System.out.println();
+        System.out.println("通知各个注册的观察者, 看看信息"); 
+        weatherData.setData(10f, 100f, 30.3f);
+    }
+}
+```
+
+### 中介者模式
+
+用一个中介对象来封装一系列的对象交互。中介者使各个对象不需要显式地相互引用，从而使其耦合松散，而且可以独立地改变它们之间的交互。
+
+<img src="./pics/mediator.jpg">
+
+1)	Mediator 就是抽象中介者，定义了同事对象到中介者对象的接口
+2)	Colleague 是抽象同事类
+3)	ConcreteMediator 具体的中介者对象，实现抽象方法，他需要知道所有的具体的同事类，即以一个集合来管理，并接受某个同事对象消息，完成相应的任务
+4)	ConcreteColleague 具体的同事类，会有很多，每个同事只知道自己的行为， 而不了解其他同事类的行为(方法)， 但是他们都依赖中介者对象
+
+在MVC中有使用。
+
+**优点**
+
+1. 对网状结构进行解耦，符合迪米特原则
+
+**缺点**
+
+1. 中介者承担过多责任，如果出现问题，整个系统都会受到影响
+
+```java
+public abstract class Mediator {
+    //将给中介者对象，加入到集合中
+    public abstract void Register(String colleagueName, Colleague colleague);
+
+    //接收消息, 具体的同事对象发出
+    public abstract void GetMessage(int stateChange, String colleagueName);
+
+    public abstract void SendMessage();
+}
+
+//具体的中介者类
+public class ConcreteMediator extends Mediator {
+    //集合，放入所有的同事对象
+    private HashMap<String, Colleague> colleagueMap;
+    private HashMap<String, String> interMap;
+ 
+    public ConcreteMediator() {
+    	colleagueMap = new HashMap<String, Colleague>(); 
+        interMap = new HashMap<String, String>();
+    }
+
+    @Override
+    public void Register(String colleagueName, Colleague colleague) {
+   		colleagueMap.put(colleagueName, colleague);
+        if (colleague instanceof Alarm) 
+            interMap.put("Alarm", colleagueName);
+        else if (colleague instanceof CoffeeMachine) 
+            interMap.put("CoffeeMachine", colleagueName);
+        else if (colleague instanceof TV) 
+            interMap.put("TV", colleagueName);
+        else if (colleague instanceof Curtains)  
+            interMap.put("Curtains", colleagueName);
+    }
+    
+    //1. 根据得到消息，完成对应任务
+    //2. 中介者在这个方法，协调各个具体的同事对象，完成任务
+    @Override
+    public void GetMessage(int stateChange, String colleagueName) {
+        //处理闹钟发出的消息
+        if (colleagueMap.get(colleagueName) instanceof Alarm) { 
+            if (stateChange == 0) {
+            	((CoffeeMachine) (colleagueMap.get(interMap.get("CoffeeMachine")))).StartCoffee();
+            ((TV) (colleagueMap.get(interMap.get("TV")))).StartTv();
+            } else if (stateChange == 1) {
+            	((TV) (colleagueMap.get(interMap.get("TV")))).StopTv();
+            }
+        } else if (colleagueMap.get(colleagueName) instanceof CoffeeMachine) 
+            ((Curtains) (colleagueMap.get(interMap.get("Curtains")))).UpCurtains();
+        else if (colleagueMap.get(colleagueName) instanceof TV) {
+            //如果 TV 发现消息
+        } else if (colleagueMap.get(colleagueName) instanceof Curtains) {
+            //如果是以窗帘发出的消息，这里处理...
+        }
+    }
+}
+
+//具体的同事类
+public class Alarm extends Colleague {
+
+    //构造器
+    public Alarm(Mediator mediator, String name) {
+    	super(mediator, name);
+    	//在创建 Alarm 同事对象时，将自己放入到 ConcreteMediator 对象中[集合] 
+        mediator.Register(name, this);
+    }
+
+    public void SendAlarm(int stateChange) { 
+        SendMessage(stateChange);
+    }
+
+    @Override
+    public void SendMessage(int stateChange) {
+    	// 调 用 的 中 介 者 对 象 的 getMessage 
+        this.GetMediator().GetMessage(stateChange, this.name);
+    }
+}
+
+public class CoffeeMachine extends Colleague {
+    public CoffeeMachine(Mediator mediator, String name) { 
+        super(mediator, name);                       
+        mediator.Register(name, this);
+    }
+
+
+    @Override
+    public void SendMessage(int stateChange) {
+        this.GetMediator().GetMessage(stateChange, this.name);
+    }
+
+
+    public void StartCoffee() { 
+        System.out.println("It's time to startcoffee!");
+    }
+
+
+    public void FinishCoffee() {
+
+
+        System.out.println("After 5 minutes!"); 
+        System.out.println("Coffee is ok!"); SendMessage(0);
+    }
+}
+
+//同事抽象类
+public abstract class Colleague {
+	private Mediator mediator; 
+    public String name;
+
+    public Colleague(Mediator mediator, String name) {
+    	this.mediator = mediator; 
+        this.name = name;
+    }
+
+    public Mediator GetMediator() { 
+        return this.mediator;
+    }
+
+    public abstract void SendMessage(int stateChange);
+}
+
+public class Curtains extends Colleague {
+
+    public Curtains(Mediator mediator, String name) { 
+        super(mediator, name);
+        mediator.Register(name, this);
+    }
+
+    @Override
+    public void SendMessage(int stateChange) {
+        this.GetMediator().GetMessage(stateChange, this.name);
+    }
+
+    public void UpCurtains() {
+        System.out.println("I am holding Up Curtains!");
+    }
+}
+
+public class TV extends Colleague {
+    public TV(Mediator mediator, String name) { 
+        super(mediator, name);
+        mediator.Register(name, this);
+    }
+
+    @Override
+    public void SendMessage(int stateChange) {
+        this.GetMediator().GetMessage(stateChange, this.name);
+    }
+
+    public void StartTv() {
+        System.out.println("It's time to StartTv!");
+    }
+
+    public void StopTv() {
+        System.out.println("StopTv!");
+    }
+}
+
+public class ClientTest {
+    public static void main(String[] args) {
+    	//创建一个中介者对象
+    	Mediator mediator = new ConcreteMediator();
+        Alarm alarm = new Alarm(mediator, "alarm");
+        CoffeeMachine coffeeMachine = new CoffeeMachine(mediator, "coffeeMachine");
+        Curtains curtains = new Curtains(mediator, "curtains");
+    	TV tV = new TV(mediator, "TV");
+
+    	//让闹钟发出消息
+        alarm.SendAlarm(0); 
+        coffeeMachine.FinishCoffee(); 
+        alarm.SendAlarm(1);
+    }
+}
+```
+
+### 备忘录模式
+
+在不破坏封装性的前提下，捕获一个对象的内部状态，并在该对象之外保存这个状态。这样以后就可将该对象恢复到原先保存的状态。
+
+<img src="./pics/memo.jpg">
+
+1)	originator :  对象(需要保存状态的对象)
+2)	Memento ： 备忘录对象，负责保存好记录，即Originator 内部状态
+3)	Caretaker: 守护者对象，负责保存多个备忘录对象，使用集合管理，提高效率
+4)	说明：如果希望保存多个 originator 对象的不同时间的状态，需要 HashMap <String, 集合>
+
+**优点**
+
+1. 提供恢复机制，用户可以回到历史状态
+2. 实现封装，不暴露细节
+3. 可以配合原型模式使用
+
+**缺点**
+
+1. 消耗内存过多
+
+```java
+public class Originator {
+    private String state;//状态信息
+    
+    public String getState() {
+    	return state;
+    }
+
+    public void setState(String state) { 
+        this.state = state;
+    }
+
+    //保存一个状态对象Memento
+    public Memento saveStateMemento() { 
+        return new Memento(state);
+    }
+
+    //通过备忘录对象，恢复状态
+    public void getStateFromMemento(Memento memento) { 
+        state = memento.getState();
+	}
+}
+
+public class Memento { 
+    private String state;
+
+    public Memento(String state) { 
+        super();
+    	this.state = state;
+    }
+
+    public String getState() { 
+        return state;
+    }
+}
+
+public class Caretaker {
+    //在 List 集合中会有很多的备忘录对象
+    private List<Memento> mementoList = new ArrayList<Memento>();
+
+
+    public void add(Memento memento) { 
+        mementoList.add(memento);
+    }
+
+    //获取到第 index 个 Originator 的 备忘录对象(即保存状态) 
+    public Memento get(int index) {
+    	return mementoList.get(index);
+    }
+}
+
+public class Client {
+    public static void main(String[] args) {
+        Originator originator = new Originator(); 
+        Caretaker caretaker = new Caretaker();
+        originator.setState(" 状态#1  攻击力 100 ");
+        caretaker.add(originator.saveStateMemento());//保存了当前的状态
+        originator.setState(" 状 态 #2 攻 击 力 80 "); 
+        caretaker.add(originator.saveStateMemento());
+        originator.setState(" 状 态 #3 攻 击 力 50 "); 
+        caretaker.add(originator.saveStateMemento());
+        System.out.println("当前的状态是 =" + originator.getState());
+        //希望得到状态 1, 将 originator 恢复到状态 1 
+        originator.getStateFromMemento(caretaker.get(0));
+        System.out.println("恢复到状态 1，" + originator.getState());
+    }
+}
+```
+
+### 解释器模式
+
+是指给定一个语言(表达式)，定义它的文法的一种表示，并定义一个解释器， 使用该解释器来解释语言中的句子(表达式)。
+
+<img src="./pics/interpret.jpg">
+
+1)	Context: 是环境角色，含有解释器之外的全局信息.
+2)	AbstractExpression: 抽象表达式， 声明一个抽象的解释操作，为抽象语法树中所有节点所共享
+3)	TerminalExpression: 为终结符表达式，实现与文法中的终结符相关的解释操作
+4)	NonTermialExpression: 为非终结符表达式，为文法中的非终结符实现解释操作
+5)	说明： 通过 Client输入Context和TerminalExpression信息
+
+在Spring框架中`org.springframework.expression.Expression.SpelExpressionParser`有应用。SpelExpressionParser继承了TemplateAwareExpressionParser，而TemplateAwareExpressionParser实现了ExpressionParser接口。
+
+Expression接口是我们的抽象表达式。是用的时候，根据创建的不同parser对象返回不同的Expression对象。
+
+**优点**
+
+1. 具有良好的扩展性
+
+**缺点**
+
+1. 容易出现类爆炸
+2. 采用递归调用方法，将会导致调试非常复杂、效率可能降低
+
+```java
+/**
+ *	抽象类表达式，通过 HashMap 键值对,可以获取到变量的值
+ */
+public abstract class Expression {
+    // a + b - c
+    // 解释公式和数值, key是表达式，参数[a,b,c], value是具体值
+    // HashMap {a=10, b=20}
+    public abstract int interpreter(HashMap<String, Integer> var);
+}
+
+/**
+ *	变量的解释器
+ */
+public class VarExpression extends Expression {
+	private String key; // key=a,key=b,key=c
+	public VarExpression(String key) { this.key = key;}
+
+    // interpreter 根据 变量名称，返回对应值
+    @Override
+    public int interpreter(HashMap<String, Integer> var) { 
+        return var.get(this.key);
+    }
+}
+
+/**
+ *	抽象运算符号解析器: 每个运算符号，都只和自己左右两个数字有关系，
+ *	但左右两个数字有可能也是一个解析的结果，无论何种类型，都是 Expression 类的实现类
+ */
+public class SymbolExpression extends Expression {
+	protected Expression left; 
+    protected Expression right;
+
+    public SymbolExpression(Expression left, Expression right) {
+    	this.left = left; 
+        this.right = right;
+    }
+
+    //因为SymbolExpression是让其子类来实现，因此 interpreter 是一个默认实现
+    @Override
+    public int interpreter(HashMap<String, Integer> var) {
+    	return 0;
+    }
+}
+
+/**
+*	加法解释器
+*	@author Administrator
+*
+*/
+public class AddExpression extends SymbolExpression	{
+
+    public AddExpression(Expression left, Expression right) { 
+        super(left, right);
+    }
+
+    //处理相加
+    //var 仍然是 {a=10,b=20}..
+    public int interpreter(HashMap<String, Integer> var) {
+    	//super.left.interpreter(var): 返回 left 表达式对应的值 a = 10
+    	//super.right.interpreter(var): 返回 right 表达式对应值 b = 20
+    	return super.left.interpreter(var) + super.right.interpreter(var);
+    }
+}
+
+public class SubExpression extends SymbolExpression {
+    public SubExpression(Expression left, Expression right) {
+    	super(left, right);
+    }
+
+    //求出 left 和 right  表达式相减后的结果
+    public int interpreter(HashMap<String, Integer> var) {
+    	return super.left.interpreter(var) - super.right.interpreter(var);
+    }
+}
+
+public class Calculator {
+    // 定义表达式
+    private Expression expression;
+    // 构造函数传参，并解析
+    public Calculator(String expStr) { // expStr = a+b
+        // 安排运算先后顺序
+        Stack<Expression> stack = new Stack<>();
+        // 表达式拆分成字符数组
+        char[] charArray = expStr.toCharArray();// [a, +, b]
+
+        Expression left = null; 
+        Expression right = null;
+        //遍历我们的字符数组，即遍历[a, +, b]，针对不同的情况做处理
+        for (int i = 0; i < charArray.length; i++) { 
+            switch (charArray[i]) {
+                case '+': //
+                	left = stack.pop();
+                	right = new VarExpression(String.valueOf(charArray[++i]));
+                    //构建 AddExpresson，加入stack
+                	stack.push(new AddExpression(left, right));
+                	break; 
+                case '-': //
+                    left = stack.pop();
+                    right = new VarExpression(String.valueOf(charArray[++i])); 
+                    stack.push(new SubExpression(left, right));
+                    break; 
+                default:
+                    //如果是一个 Var 就创建要给 VarExpression 对象，并 push 到 stack
+                    String var = String.valueOf(charArray[i]);
+                    stack.push(new VarExpression(var));
+                    break;
+            }
+        }
+    	//当遍历完整个charArray数组后，stack就得到最后Expression 
+        this.expression = stack.pop();
+    }
+
+    public int run(HashMap<String, Integer> var) {
+        //最后将表达式 a+b 和 var = {a=10,b=20}
+        //然后传递给 expression 的 interpreter 进行解释执行
+        return this.expression.interpreter(var);
+    }
+}
+
+public class ClientTest {
+    public static void main(String[] args) throws IOException {
+        String expStr = getExpStr(); // a+b
+        HashMap<String, Integer> var = getValue(expStr);// var {a=10, b=20}
+        Calculator calculator = new Calculator(expStr);
+        System.out.println("运算结果：" + expStr + "=" + calculator.run(var));
+    }
+
+    // 获得表达式
+    public static String getExpStr() throws IOException {
+    	System.out.print("请输入表达式：");
+    	return (new BufferedReader(new InputStreamReader(System.in))).readLine();
+    }
+
+    // 获得值映射
+    public static HashMap<String, Integer> getValue(String expStr) throws IOException { 
+        HashMap<String, Integer> map = new HashMap<>();
+
+        for (char ch : expStr.toCharArray()) { 
+            if (ch != '+' && ch != '-') {
+        		if (!map.containsKey(String.valueOf(ch))) {
+                    System.out.print("请输入" + String.valueOf(ch) + "的值：");
+                    String in = (new BufferedReader(new InputStreamReader(System.in))).readLine(); 
+                    map.put(String.valueOf(ch), Integer.valueOf(in));
+            	}
+    		}
+    	}
+    	return map;
+    }
+}
+```
+
+### 状态模式
+
+它主要用来解决对象在多种状态转换时，需要对外输出不同的行为的问题。状态和行为是一一对应的，状态之间可以相互转换。一个对象的内在状态改变时，允许改变其行为，这个对象看起来像是改变了其类。
+
+1)	Context 类为环境角色,  用于维护 State 实例,这个实例定义当前状态
+2)	State 是抽象状态角色,定义一个接口封装与 Context  的一个特点接口相关行为
+3)	ConcreteState 具体的状态角色，每个子类实现一个与 Context 的一个状态相关行为
+
+**优点**
+
+1. 增强代码可读性，将每个状态行为封装到一个类，方便维护
+2. 符合开闭原则
+
+**缺点**
+
+1. 容易出现类爆炸
+
+```java
+/**
+ *	状态抽象类
+ */
+public abstract class State {
+    // 扣除积分
+    public abstract void deductMoney();
+
+    // 是否抽中奖品
+    public abstract boolean raffle();
+
+    // 发放奖品
+    public abstract	void dispensePrize();
+}
+
+/**
+ *	不能抽奖状态
+ */
+public class NoRaffleState extends State {
+
+    // 初始化时传入活动引用，扣除积分后改变其状态
+    RaffleActivity activity;
+
+    public NoRaffleState(RaffleActivity activity) { 
+        this.activity = activity;
+    }
+
+    // 当前状态可以扣积分, 扣除后，将状态设置成可以抽奖状态
+    @Override
+    public void deductMoney() {
+    	System.out.println("扣除50积分成功，您可以抽奖了"); 
+        activity.setState(activity.getCanRaffleState());
+    }
+
+    // 当前状态不能抽奖
+    @Override
+    public boolean raffle() {
+    	System.out.println("扣了积分才能抽奖喔！"); 
+        return false;
+    }
+
+    // 当前状态不能发奖品
+    @Override
+    public void dispensePrize() {
+    	System.out.println("不能发放奖品");
+    }
+}
+
+/**
+ *	可以抽奖的状态
+ */
+public class CanRaffleState extends State {
+
+    RaffleActivity activity;
+
+    public CanRaffleState(RaffleActivity activity) { 
+        this.activity = activity;
+    }
+
+    //已经扣除了积分，不能再扣 
+    @Override
+    public void deductMoney() {
+    	System.out.println("已经扣取过了积分");
+    }
+    
+    //可以抽奖, 抽完奖后，根据实际情况，改成新的状态
+    @Override
+    public boolean raffle() { 
+        System.out.println("正在抽奖，请稍等！"); 
+        Random r = new Random();
+    	int num = r.nextInt(10);
+    	// 10%中奖机会
+        if(num == 0){
+    		// 改 变 活 动 状 态 为 发 放 奖 品 context 
+            activity.setState(activity.getDispenseState());
+    		return true;
+    	} else {
+       		System.out.println("很遗憾没有抽中奖品！");
+            // 改变状态为不能抽奖
+            activity.setState(activity.getNoRafflleState()); 
+            return false;
+    	}
+    }
+
+    // 不能发放奖品
+    @Override
+    public void dispensePrize() {
+    	System.out.println("没中奖，不能发放奖品");
+    }
+}
+
+/**
+ *	发放奖品的状态
+ */
+public class DispenseState extends State {
+    // 初始化时传入活动引用，发放奖品后改变其状态
+    RaffleActivity activity;
+    public DispenseState(RaffleActivity activity) { 
+        this.activity = activity;
+    }
+
+    @Override
+    public void deductMoney() {
+    	System.out.println("不能扣除积分");
+    }
+
+
+    @Override
+    public boolean raffle() {
+    	System.out.println("不能抽奖"); 
+        return false;
+    }
+
+    //发放奖品 
+    @Override
+    public void dispensePrize() { 
+        if(activity.getCount() > 0){
+            System.out.println("恭喜中奖了");
+            // 改变状态为不能抽奖
+            activity.setState(activity.getNoRafflleState());
+        }else{
+            System.out.println("很遗憾，奖品发送完了");
+            // 改变状态为奖品发送完毕, 后面我们就不可以抽奖
+            activity.setState(activity.getDispensOutState());
+            //System.out.println("抽奖活动结束");
+            //System.exit(0);
+        }
+    }
+}
+
+/**
+ *	奖品发放完毕状态
+ *	说明，当我们 activity 改变成 DispenseOutState， 抽奖活动结束
+ */
+public class DispenseOutState extends State {
+
+    // 初始化时传入活动引用
+    RaffleActivity activity;
+
+    public DispenseOutState(RaffleActivity activity) { 
+        this.activity = activity;
+    }
+    
+    @Override
+    public void deductMoney() {
+    	System.out.println("奖品发送完了，请下次再参加");
+    }
+
+    @Override
+    public boolean raffle() {
+    	System.out.println("奖品发送完了，请下次再参加"); 
+        return false;
+    }
+
+    @Override
+    public void dispensePrize() {
+    	System.out.println("奖品发送完了，请下次再参加");
+    }
+}
+
+/**
+ *	抽奖活动
+ */
+public class RaffleActivity {
+    // state 表示活动当前的状态，是变化
+    State state = null;
+    // 奖品数量
+    int count = 0;
+
+    // 四个属性，表示四种状态
+    State noRafflleState = new NoRaffleState(this); 
+    State canRaffleState = new CanRaffleState(this);
+    State dispenseState = new DispenseState(this); 
+    State dispensOutState = new DispenseOutState(this);
+
+    //构造器
+    //1. 初始化当前的状态为 noRafflleState（即不能抽奖的状态）
+    //2. 初始化奖品的数量
+    public RaffleActivity(int count) { 
+        this.state = getNoRafflleState(); 
+        this.count = count;
+    }
+
+    //扣分, 调用当前状态的 deductMoney 
+    public void debuctMoney(){
+    	state.deductMoney();
+    }
+
+    //抽奖
+    public void raffle(){
+    	// 如果当前的状态是抽奖成功
+    	if(state.raffle()){
+    		//领取奖品
+            state.dispensePrize();
+    	}
+	}
+
+    public State getState() { return state;}
+
+    public void setState(State state) { this.state = state;}
+
+    public int getCount() {
+        int curCount = count; 
+        count--;
+        return curCount;
+    }
+
+    public void setCount(int count) { this.count = count;}
+
+    public State getNoRafflleState() { 
+        return noRafflleState;
+    }
+
+    public void setNoRafflleState(State noRafflleState) { 
+        this.noRafflleState = noRafflleState;
+    }
+
+    public State getCanRaffleState() { 
+        return canRaffleState;
+    }
+
+    public void setCanRaffleState(State canRaffleState) { 
+        this.canRaffleState = canRaffleState;
+    }
+
+    public State getDispenseState() { 
+        return dispenseState;
+    }
+
+    public void setDispenseState(State dispenseState) { 
+        this.dispenseState = dispenseState;
+    }
+
+    public State getDispensOutState() { 
+        return dispensOutState;
+    }
+
+
+    public void setDispensOutState(State dispensOutState) { 
+        this.dispensOutState = dispensOutState;
+    }
+}
+
+/**
+ *	状态模式测试类
+ */	
+public class ClientTest {
+    public static void main(String[] args) {
+        // 创建活动对象，奖品有 1 个奖品
+        RaffleActivity activity = new RaffleActivity(1);
+        // 我们连续抽 30 次奖
+        for (int i = 0; i < 30; i++) {
+            System.out.println("--------第" + (i + 1) + "次抽奖----------");
+            // 参加抽奖，第一步点击扣除积分
+            activity.deductMoney();
+            // 第二步抽奖
+            activity.raffle();
+        }
+    }
+}
+```
+
+### 策略模式
+
+定义算法族（策略组），分别封装起来，让他们之间可以互相替换，此模式让算法的变化独立于使用算法的客户。体现了三个设计原则，第一、把变化的代码从不变的代码中分离出来；第二、针对接口编程而不是具体类（定义策略接口）；第三、多用组合/聚合，少用继承（客户通过组合方式使用策略）。
+
+<img src="./pics/strategy.jpg">
+
+在JDK源码Array有应用。Comparator中的sort方法使用了策略模式。
+
+**优点**
+
+1. 体现ocp原则
+2. 将算法封装在独立的strategy类中，使得程序员可以独立于其context改变它，易于扩展
+
+**缺点**
+
+1. 容易出现类爆炸
+
+**案例**
+
+有各种鸭子（野鸭、北京鸭等）， 鸭子有各种行为（叫、飞行等)；显示鸭子的信息。
+
+传统解决方案如下。
+
+缺陷：对超类的局部改动，会影响其他部分，会有溢出效应。
+
+```java
+public abstract class Duck {
+
+	public abstract void display();//显示鸭子信息
+    
+    public void quack() {
+    	System.out.println("鸭子嘎嘎叫~~");
+    }
+
+    public void swim() {
+    	System.out.println("鸭子会游泳~~");
+    }
+
+    public void fly() {
+    	System.out.println("鸭子会飞翔~~~");
+    }
+}
+
+public class PekingDuck extends Duck {
+    @Override
+    public void display() {
+    	System.out.println("~~北京鸭~~~");
+    }
+
+    //因为北京鸭不能飞翔，因此需要重写 fly 
+    @Override
+    public void fly() {
+    	System.out.println("北京鸭不能飞翔");
+    }
+}
+
+public class ToyDuck extends Duck{
+    @Override
+    public void display() {
+    	System.out.println("玩具鸭");
+    }
+    
+    //需要重写父类的所有方法 
+    public void quack() {
+    	System.out.println("玩具鸭不能叫~~");
+    }
+
+    public void swim() {
+    	System.out.println("玩具鸭不会游泳~~");
+    }
+
+    public void fly() {
+    	System.out.println("玩具鸭不会飞翔~~~");
+    }
+}
+
+public class WildDuck extends Duck {
+    @Override
+    public void display() {
+    	System.out.println(" 这是野鸭 ");
+    }
+}
+```
+
+改进方案如下。
+
+```java
+public class Client {
+    public static void main(String[] args) {
+        WildDuck wildDuck = new WildDuck(); 
+        wildDuck.fly();
+        PekingDuck pekingDuck = new PekingDuck(); 
+        pekingDuck.fly();
+        ToyDuck toyDuck = new ToyDuck(); 
+        toyDuck.fly();
+
+        //动态改变某个对象的行为, 北京鸭不能飞
+        pekingDuck.setFlyBehavior(new NoFlyBehavior());
+        System.out.println("北京鸭的实际飞翔能力");
+        pekingDuck.fly();
+    }
+}
+
+public interface FlyBehavior {
+    void fly(); //  子类具体实现
+}
+
+public class GoodFlyBehavior implements FlyBehavior {
+    @Override
+    public void fly() {
+        System.out.println(" 飞翔技术高超 ~~~");
+    }
+}
+
+public class BadFlyBehavior implements FlyBehavior {
+    @Override
+    public void fly() {
+    	System.out.println(" 飞翔技术一般 ");
+    }
+}
+
+public class NoFlyBehavior implements FlyBehavior{
+    @Override
+    public void fly() {
+    	System.out.println(" 不会飞翔	");
+    }
+}
+
+public interface QuackBehavior { 
+    void quack();//子类实现
+}
+
+public abstract class Duck {
+    //属性, 策略接口
+    FlyBehavior flyBehavior;
+    //其它属性<->策略接口
+    QuackBehavior quackBehavior;
+
+    public abstract void display();
+    
+    public void quack() {
+    	System.out.println("鸭子嘎嘎叫~~");
+    }
+
+    public void swim() {
+    	System.out.println("鸭子会游泳~~");
+    }
+
+    public void fly() {  //改进
+        if(flyBehavior != null) 
+            flyBehavior.fly();
+    }
+
+    public void setFlyBehavior(FlyBehavior flyBehavior) { 
+        this.flyBehavior = flyBehavior;
+    }
+
+    public void setQuackBehavior(QuackBehavior quackBehavior) { 
+        this.quackBehavior = quackBehavior;
+    }
+}
+
+public class PekingDuck extends Duck {
+	//假如北京鸭可以飞翔，但是飞翔技术一般 
+    public PekingDuck() {
+        flyBehavior = new BadFlyBehavior();
+	}
+
+    @Override
+    public void display() {
+    	System.out.println("~~北京鸭~~~");
+    }
+}
+
+public class ToyDuck extends Duck{
+    public ToyDuck() {
+        flyBehavior = new NoFlyBehavior();
+    }
+
+
+    @Override
+    public void display() {
+    	System.out.println("玩具鸭");
+    }
+
+    public void quack() {
+    	System.out.println("玩具鸭不能叫~~");
+    }
+
+    public void swim() {
+    	System.out.println("玩具鸭不会游泳~~");
+    }
+}
+
+public class WildDuck extends Duck {
+    //构造器，传入 FlyBehavor 的对象
+    public	WildDuck() {
+    	flyBehavior = new GoodFlyBehavior();
+    }
+    @Override
+    public void display() {
+    	System.out.println(" 这是野鸭 ");
+    }
+}
+```
+
+### 责任链模式 Chain of Responsibility Pattern
+
+为请求创建了一个接收者对象的链(简单示意图)。这种模式对请求的发送者和接收者进行解耦。职责链模式通常每个接收者都包含对另一个接收者的引用。如果一个对象不能处理该请求，那么它会把相同的请求传给下一个接收者，依此类推。应用场景包括有多个对象可以处理同一个请求时，比如：多级请求、请假/加薪等审批流程、Java Web 中 Tomcat对 Encoding 的处理、拦截器。
+
+<img src = "./pics/responsibility.jpg">
+
+1)	Handler是抽象的处理者,  定义了一个处理请求的接口,  同时含有另外 Handler
+2)	ConcreteHandlerA , B  是具体的处理者, 处理它自己负责的请求， 可以访问它的后继者(即下一个处理者),  如果可以处理当前请求，则处理，否则就将该请求交个后继者去处理，从而形成一个职责链
+3)	Request表示一个请求，含有很多属性
+
+在SpringMVC的Handler中有应用。springmvc 请求的流程图中，执行了拦截器相关方法 `interceptor.preHandler()` 等等。在处理 SpringMvc 请求时，使用到职责链模式和适配器模式。HandlerExecutionChain 主要负责的是请求拦截器的执行和请求处理，但是他本身不处理请求，只是将请求分配给链上注册处理器执行，这是职责链实现方式；减少职责链本身与处理逻辑之间的耦合，规范了处理流程。HandlerExecutionChain 维护了HandlerInterceptor 的集合，可以向其中注册相应的拦截器。
+
+**优点**
+
+1. 将请求和处理分开，实现解耦，提高系统的灵活性
+2. 简化了对象，对象不需要知道链的结构
+
+**缺点**
+
+1. 在链比较长的时候，性能会受到影响，需控制链中最大节点数量，一般通过在 Handler 中设置一个最大节点数量，在 setNext()方法中判断是否已经超过阀值，超过则不允许该链建立。
+2. 调试不方便。采用了类似递归的方式，调试时逻辑可能比较复杂
+
+```java
+public static void main(String[] args) {
+// DispatcherServlet
+
+//说明
+/*
+*	protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {
+*	HandlerExecutionChain mappedHandler = null;
+*	mappedHandler = getHandler(processedRequest);//获取到 HandlerExecutionChain 对象
+*	//在 mappedHandler.applyPreHandle内部得到HandlerInterceptor interceptor
+*	//调用了拦截器的	interceptor.preHandle
+*	if (!mappedHandler.applyPreHandle(processedRequest, response)) { return;
+}
+
+//说明：mappedHandler.applyPostHandle 方法内部获取到拦截器，并调用
+//拦截器的	interceptor.postHandle(request, response, this.handler, mv);
+mappedHandler.applyPostHandle(processedRequest, response, mv);
+*	}
+*
+*
+*	//说明：在	mappedHandler.applyPreHandle 内部中，
+*	还调用了	triggerAfterCompletion 方法，该方法中调用了
+*	HandlerInterceptor interceptor = getInterceptors()[i]; 
+    try {
+        interceptor.afterCompletion(request, response, this.handler, ex);
+    }
+    catch (Throwable ex2) {
+        logger.error("HandlerInterceptor.afterCompletion threw exception", ex2);
+    }
+*/
+}
+```
+
+
+
+```java
+//请求类
+public class PurchaseRequest {
+	private int type = 0; //请求类型
+    private float price = 0.0f; //请求金额
+	private int id = 0;
+    
+    public PurchaseRequest(int type, float price, int id) { 
+        this.type = type;
+    	this.price = price;
+    	this.id = id;
+    }
+    public int getType() { 
+        return type;
+    }
+    public float getPrice() { 
+        return price;
+    }
+    public int getId() { 
+        return id;
+    }
+}
+
+public abstract class Approver {
+	Approver approver;	// 下一个处理者，类似链表的next指针
+    String name;
+
+    public Approver(String name) {
+        this.name = name;
+    }
+
+    //下一个处理者
+    public void setApprover(Approver approver) { 
+        this.approver = approver;
+    }
+
+    //处理审批请求的方法，得到一个请求, 处理是子类完成，因此该方法做成抽象
+    public abstract void processRequest(PurchaseRequest purchaseRequest);
+}
+
+public class DepartmentApprover extends Approver {
+
+    public DepartmentApprover(String name) {
+        super(name);
+    }
+
+    @Override
+    public void processRequest(PurchaseRequest purchaseRequest) {
+        if(purchaseRequest.getPrice() <= 5000)    
+            System.out.println("请求编号id = " + purchaseRequest.getId() + "被" + this.name + "处理");
+    	else 
+    		approver.processRequest(purchaseRequest);
+	}
+}
+
+public class CollegeApprover extends Approver {
+    public CollegeApprover(String name) {
+        super(name);
+    }
+
+    @Override
+    public void processRequest(PurchaseRequest purchaseRequest) {
+    	if (purchaseRequest.getPrice() > 5000 && purchaseRequest.getPrice() <= 10000) 
+    		System.out.println("请求编号id = " + purchaseRequest.getId() + "被" + this.name + "处理");
+    	else 
+    		approver.processRequest(purchaseRequest);
+    }
+}
+
+public class ViceSchoolMasterApprover extends Approver {
+    public ViceSchoolMasterApprover(String name) {
+    	super(name);
+    }
+
+
+    @Override
+    public void processRequest(PurchaseRequest purchaseRequest) {
+    	if(purchaseRequest.getPrice() > 10000 && purchaseRequest.getPrice() <= 30000) 
+    		System.out.println("请求编号id = " + purchaseRequest.getId() + "被" + this.name + "处理");
+    	else 
+    		approver.processRequest(purchaseRequest);
+    }
+}
+
+public class SchoolMasterApprover extends Approver {
+    public SchoolMasterApprover(String name) { 
+        super(name);
+    }
+
+    @Override
+    public void processRequest(PurchaseRequest purchaseRequest) {
+    	if(purchaseRequest.getPrice() > 30000) 
+   			System.out.println("请求编号id = " + purchaseRequest.getId() + "被" + this.name + "处理");
+    	else 
+    		approver.processRequest(purchaseRequest);
+    }
+}
+
+public class Client {
+    public static void main(String[] args) {
+        //创建一个请求
+        PurchaseRequest purchaseRequest = new PurchaseRequest(1, 31000, 1);
+
+        //创建相关的审批人
+        DepartmentApprover departmentApprover = new DepartmentApprover("张主任"); 
+        CollegeApprover collegeApprover = new CollegeApprover("李院长");
+        ViceSchoolMasterApprover viceSchoolMasterApprover = new ViceSchoolMasterApprover("王副校"); 
+        SchoolMasterApprover schoolMasterApprover = new SchoolMasterApprover("佟校长");
+
+        //需要将各个审批级别的下一个设置好 (处理人构成环形: ) 
+        departmentApprover.setApprover(collegeApprover); 
+        collegeApprover.setApprover(viceSchoolMasterApprover); 
+        viceSchoolMasterApprover.setApprover(schoolMasterApprover); 
+        schoolMasterApprover.setApprover(departmentApprover);
+
+        departmentApprover.processRequest(purchaseRequest); 		
+        viceSchoolMasterApprover.processRequest(purchaseRequest);
+    }
+}
+```
+
+
+
+
+
+
+
+
+
+# Reference
+
+- 《尚硅谷Java设计模式》 by 韩顺平， https://www.bilibili.com/video/BV1G4411c7N4
+- https://www.cnblogs.com/yxlblogs/p/9183318.html
+
+
+

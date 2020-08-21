@@ -9,8 +9,10 @@ T maxof (const T &a, const T &b){
 }
 ```
 使用maxof<int> (a, b)调用。// a和b均为int类型  
+
 在link阶段，如果出现build failure，就把.cpp文件中的template的实现移动到.h文件中。
 编译器会出现argument deduction的推断，有时候可以不指名template所需要的变量类型（红色标注）。
+
 ## auto
 系统自动适应变量类型，程序员不需要花费时间去了解一个变量声明时的类型。
 ## Include Guard
@@ -60,7 +62,7 @@ Get:
 	
 ## Deque & Queue & Stack
 // deque和list非常像  
-  
+
 ## Set
 提供hash key。multiset允许重复元素的出现。默认是根据alphabetical顺序排列，但是也有unordered_set。  
 删除元素：
@@ -72,7 +74,7 @@ if(it != set.end()){
 	cout << ”not found\n”;
 }
 ```
-    	
+
 ## Maps
 .insert({ })方法括号中一定是一个大括号。该方法有三个返回值，第一个是插入元素(或阻止插入的元素)的迭代器，第二个是布林值指示插入操作是否成功。分别用.first和.second来取。
 .find()方法返回指针。  
@@ -87,7 +89,7 @@ for(auto it = set.end(); it != set.begin();){
 }
 auto it2 = v1.begin() + 5;  // *it2是第6个元素
 auto it3 = v1.end() - 5;  // *it3是倒数第5个元素
-```  
+```
 读取
 ```
 cin.clear();
@@ -104,7 +106,7 @@ ostream_iterator<int> output(cout, “ ”);
 for(int i : {1, 10, 100}) {
 	*output++ = i;
 } 
-```    
+```
 
 ## Transform
 ```

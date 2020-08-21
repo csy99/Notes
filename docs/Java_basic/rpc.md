@@ -18,7 +18,7 @@ User类里面有两个属性，id和name。UserService接口有一个方法是fi
 
 ```java
 public class Client {
-    psvm() {
+    public static void main() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();        
         DataOutputStream dos = new DataOutputStream(baos);
         dos.writeInt(123);
@@ -60,7 +60,7 @@ public class Server {
 
 ```java
 public class Client {
-    psvm() {
+    public static void main() {
         Stub stub = new Stub();
         stub.findUserById(123);
     }
@@ -94,7 +94,7 @@ public class Stub {
 
 ```java
 public class Client {
-    psvm() {
+    public static void main() {
         IUserService service = Stub.getStub();
         service.findUserById(123);
     }
@@ -237,7 +237,7 @@ public class Stub {
 
 ```java
 public class HelloHessian {
-    psvm() {
+    public static void main() {
         User u = new User(1, "adf");
         byte[] bytes = serialize(u);
         User u1 = (User)deserialize(bytes);

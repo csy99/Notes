@@ -1,29 +1,36 @@
 # 在cmd运行的指令
 
-1.  list  
-list all the tables
+1. list  
 
-2.  !describe \`*table*\`  
-return attributes related to the table
+   list all the tables
 
-3.  create \`*table*\`, \`*column family*\`  
-create a new table with a column family
+2. !describe \`*table*\`  
 
-4.  exit  
-exit the shell
+   return attributes related to the table
 
-5.  curl – o \~/*file URL*  
-output saved to the file with the URL
+3. create \`*table*\`, \`*column family*\`  
 
-6.  head *file*  
-gives a view of the file
+   create a new table with a column family
 
-7.  sed -i \`1d\` *file*  
-get rid of the header row
+4. exit  
 
-8.  hadoop fs -copyFromLocal *path* *path2*
+   exit the shell
 
-9.  hadoop fs -ls *path2*
+5. curl – o \~/*file URL*  
+
+   output saved to the file with the URL
+
+6. head *file*  
+
+   gives a view of the file
+
+7. sed -i \`1d\` *file*  
+
+   get rid of the header row
+
+8. hadoop fs -copyFromLocal *path* *path2*
+
+9. hadoop fs -ls *path2*
 
 10. \\表示下行继续  
 ```
@@ -61,4 +68,4 @@ returns all values without repetition
 6.  upsert into “*table*” select … from “*table*”  
 load the data from somewhere into the table
 
-
+```
