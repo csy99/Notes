@@ -1,42 +1,12 @@
-# 常用模型
-
-## 3.1 线性回归
-
-### 3.1.1 原理
-
-#### 输入
-
-训练集数据$T = {(x_1,y_1) ... (x_M,y_M)}$，$x_i \in \mathcal{X} \subseteq R^n$，$y_i \in  R$
-
-$f(x) = w^Tx+b$
-
-正则化参数$\lambda_1$ ，$\lambda_2$
-
-#### 输出
-
-线性回归模型$\hat f(x)$
-
-#### 损失函数
-
-$L = \sum^M_{i=1}(f(x_i) - y_i)^2$
-
-均方误差对应欧氏距离。基于均方误差最小化求解的方法称为最小二乘法least square method。
-
-$w^* = (X^TX)^{-1}X^Ty$ 此时$(X^TX)$是满秩矩阵。
-
-我们也可以用模型逼近y的衍生物，比如$ln(y)$。在形式上仍是线性回归，不过实质上已是在求输入空间到输出空间的非线性函数映射。
-
-
-
-## 3.2 逻辑回归
+# 逻辑回归
 
 广义线性模型。
 
-### 3.2.1 原理
+## 原理
 
-#### 输入
+### 输入
 
-训练集数据$T = {(x_1,y_1) ... (x_M,y_M)}$，$x_i \in \mathcal{X} \subseteq R^n$，$y_i \in \mathcal{Y} \subseteq R^K$
+训练集数据$T = {(x_1,y_1) ... (x_M,y_M)}$，$x_i \in \mathcal{X} \subseteq R^n$，$y_i \in \mathcal{Y} \subseteq R^K$，二分类$y_i \in  \{-1, +1\}$
 
 损失函数$Cost(y,f(x))$
 
@@ -44,11 +14,11 @@ $w^* = (X^TX)^{-1}X^Ty$ 此时$(X^TX)$是满秩矩阵。
 
 学习速率$\alpha$，$\beta$
 
-#### 输出
+### 输出
 
 逻辑回归模型$\hat f(x)$
 
-#### 判断函数
+### 判断函数候选
 
 **单位阶跃函数**
 
@@ -58,6 +28,8 @@ $w^* = (X^TX)^{-1}X^Ty$ 此时$(X^TX)$是满秩矩阵。
 
 $y = \frac{1}{1+e^{-z}}$    $z = w^Tx+b$
 
+<img src="./pics/sigmoid.png" height="300">
+
 如果将y视为样本x作为正例的可能性，则1-y是反例可能性，两者的比值y/(1-y)称为几率，反映了x作为正例的相对可能性。上式是在用线性回归模型的预测结果去逼近真实标记的对数几率。
 
 我们可以通过极大似然法来估计w和b。
@@ -66,9 +38,20 @@ $l(w,b) = \sum_{i=1}^M ln p(y_i | x_i;w,b)$
 
 $P_w(y=j|x) = \frac{exp(x^Tw^{(j)})}{\sum_{k=1}^{K}exp(x^Tw^{(k)})}$
 
-#### 损失函数
+### 损失函数
 
-$cost = -log(\hat{p})$ if y =1. $cost = -log(1-\hat{p})$ if y =0. The reason why we are using log loss instead of MSE here is that it is a convex function. In addition, it will give larger updates when the error is larger. 
+$cost = -ylog(\hat{p}) - (1-y)log(1-\hat{p})$. 
+
+我们之所以使用对数概率函数而不是MSE的原因：(1)对数概率函数是一个凸函数；(2) 当误差较大时，对数概率函数可以提供较大的更新。
+
+推导w的MLE。
+$$
+w^* = argmax_x P(Y|X) \\\\
+= argmax_w \prod_{i=1}^{M} P(Y_i|x_i) \\\\
+= argmax_w \sum_{i=1}^{M} log P(Y_i|x_i) \\\\
+= argmax_w \sum_{i=1}^{M} [y_i log p_1 + (1-y_i) log p_0] \\\\
+$$
+
 
 
 
@@ -110,78 +93,6 @@ $cost = -log(\hat{p})$ if y =1. $cost = -log(1-\hat{p})$ if y =0. The reason why
 建议$\beta$取1。
 
 
-
-## 3.3 线性判别分析 LDA
-
-### 3.3.1 原理
-
-给定训练样例集，将样例投影到一条直线上，使得同类样例的投影点接近，异类样例的投影点尽可能远离。LDA降维最多降到类别数k-1的维数。
-
-#### 输入
-
-训练集数据$T = {(x_1,y_1) ... (x_M,y_M)}$，$x_i \in \mathcal{X} \subseteq R^n$，$y_i \in \mathcal{Y} \subseteq R^K$
-
-$X_i, \mu_i, \Sigma_i$ 分别表示第i类样例的集合、均值向量、协方差矩阵。
-
-#### 输出
-
-每个分类的均值向量，各分类数据在总体中所占比例，降维矩阵，降维后各分量的权重。
-
-#### 损失函数
-
-定义全局散度矩阵$S_t = \sum_{i=1}^M(x_i-\mu)(x_i-\mu)^T$ 
-
-定义类内散度矩阵$S_{w} = \sum_{k=1}^K S_{w_k}$。每个类的散度矩阵$S_{wk} = \sum_{x \in X_k}(x-\mu_k)(x-\mu_k)^T$ 
-
-定义类间散度矩阵$S_b = S_t - S_w = \sum_{i=1}^K(\mu_i-\mu)(\mu_i-\mu)^T$
-
-最大化目标，两个矩阵的广义瑞丽商$J = \frac {||w^T\mu_0 - w^T\mu_1||_2^2}{w^T\Sigma_0w+w^T\Sigma_1w} = \frac{w^TS_bw}{w^TS_ww}$
-
-多分类优化目标 $max_W \frac{tr(w^TS_bw)}{tr(w^TS_ww)}$. tr表示矩阵的迹(trace)，是对角线元素总和。
-
-分子分母只跟w的二次向有关，所以与w长度无关。
-
-$min_w -w^TS_bw$ s. t. $w^TS_ww=1$  => $w = S_w^{-1}(\mu_0-\mu_1)$
-
-
-
-## 3.4 多分类学习
-
-### 一对一OvO
-
-将K个类别两两配对，产生K(K-1)/2个二分类任务。存储开销和测试时间开销通常比OvR更大。
-
-### 一对其余OvR
-
-将一个类的样例作为正例，所有其他类的样例作为反例来训练N个分类器。在类别很多的时候，OvR的训练时间开销较大(每一次训练都是全量样本)。
-
-### 多对多MvM
-
-每次将若干个类作为正类，若干个其他类作为反类。
-
-技术：纠错输出码ECOC。
-
-过程：编码，对K个类别做p次划分，一共产生p个训练集，和p个分类器。解码，p个分类器分别对测试样本进行预测，预测标记组成一个编码。将编码与每个类别自己的编码比较，返回其中距离最小的类别。类别划分通过编码矩阵(二元码或者三元码)。
-
-在测试阶段，ECOC编码对分类器的错误有一定的容忍和修正能力。一般来说，对同一个学习任务，编码越长，纠错能力越强(所训练的分类器越多)。
-
-
-
-## 3.5 类别不平衡问题
-
-基本策略就是再缩放。利用$\frac{y'}{1-y'} = \frac{y}{1-y}*\frac{m^-}{m^+}$。
-
-### 欠采样
-
-代表有EasyEnsemble算法。将反例划分成若干个集合供不同学习器使用，在全局来看不会丢失重要信息。
-
-### 过采样
-
-代表有Smote算法。
-
-### 阈值移动
-
-将基本策略内嵌。
 
 
 
@@ -227,7 +138,7 @@ ID3决策树算法就是用信息增益为准则来选择划分属性。但是�
 
 #### 增益率 Gain Ratio
 
-$Gain_ratio(D, a) = \frac{Gain(D, a)}{IV(a)}$
+$Gain\_ratio(D, a) = \frac{Gain(D, a)}{IV(a)}$
 
 其中$IV(a) = \sum_{v=1}^V \frac{|D_v|}{|D|}log_2\frac{|D_v|}{|D|}$被称为a的固有值。
 
@@ -239,7 +150,7 @@ Gini(D)反映从数据集D中随机抽取两样本，其类别标记不一致的
 
 Gini impurity $Gini(D) = 1 - \sum_{k=1}^K p_{k}^2$
 
-属性a的基尼指数 Gini_index(D, a) = $\sum_{v=1}^V \frac{|D_v|}{|D|}Gini(D_v)$
+属性a的基尼指数 $ Gini\_index(D, a) = \sum_{v=1}^V \frac{|D_v|}{|D|}Gini(D_v)$
 
 选择使得划分后基尼指数最小的属性$a^* = arg min_{a \in A} Gini\_index(D, a)$
 
@@ -297,3 +208,5 @@ $Gain(D, a) = \rho * Ent(\widetilde D) - \rho* \sum_{v=1}^V \widetilde r_v  Ent(
 
 - 《美团机器学习实践》by美团算法团队，第三章
 - 《机器学习》by周志华，第三、四章
+- [白板推导系列](https://github.com/shuhuai007/Machine-Learning-Session)，shuhuai007
+

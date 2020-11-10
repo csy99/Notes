@@ -55,7 +55,7 @@ There are certain differences between the two. The Distributional Similarity emp
 
 # Loss Function损失函数
 
-Softmax function: map from $R^v$ to a probability distribution(从实数空间到概率分布的标准映射方法)。公式上面的部分将保证这个数转化成一个正数，下面的部分保证所有概率之和为1。
+Softmax function: map from $R^v$ to a probability distribution(从实数空间到概率分布的标准映射方法)。公式分子部分保证将这个数转化成一个正数，分母部分保证所有概率之和为1。
 
 $p_i = \frac {exp(u_i)} {\sum_{j} exp(u_j)}$
 
@@ -71,7 +71,7 @@ $J = 1 - p(w_{-t} | w_t)$
 
 $w_{-t}$代表$w_t$的上下文（负号表示除了该词之外）。
 
-$p(o|c) = \frac {exp(u_o^T v_c)} {\sum_{w=1}^v exp(u_w^T v_c)}$
+$p(o|c) = \frac {exp(u_o^T v_c)} {\sum_{w=1}^V exp(u_w^T v_c)}$
 
 o is the outside (or output) word index, c is the center word index. $v_c$ and $u_o$ are center and outside vectors of indices c and o. Softmax uses word c to obtain probability of word o. 
 
@@ -105,11 +105,11 @@ $$
 
 Predict context words given target (position independent). 
 
-<img src="w2v_context.png" height="200">
+<img src="https://i.postimg.cc/Y24FPnyX/w2v-context.png" height="200">
 
 在这个案例中，"into"是target (center word)，而"problems turning"和"banking crises"是我们的output context words。假设我们的句子一共有T个单词。我们定义window size（也就是预测上下文的半径）为m，这个案例中m=2。
 
-<img src="w2v_pair.png" height = "300">
+<img src="https://i.postimg.cc/j2JRhJcX/w2v-pair.png" height = "300">
 
 通过center word和context word组成一组训练数据，喂给word2vec模型。
 
@@ -121,21 +121,21 @@ $J'(\theta) = \prod_{t=1}^T \prod_{j=-m,j \ne 0}^m p(w_{t+j}|w_t; \theta)$
 
 We use negative log likelihood to turn the objective function into a loss function. 
 
-$J(\theta) = -\frac 1 {T} \sum_{t=1}^T \sum_{j=-m,j \ne 0}^m p(w_{t+j}|w_t)$
+$J(\theta) = -\frac 1 {T} \sum_{t=1}^T \sum_{j=-m,j \ne 0}^m log p(w_{t+j}|w_t)$
 
 ### Training Process训练过程
 
-<img src="w2v_skipgram.jpg" height="500">
+<img src="https://i.postimg.cc/FHxkS27K/w2v-skipgram.jpg" height="500">
 
 这张图第一眼看上去非常花哨，但是其实把这个工作流程说清楚了。d表示向量的维度，V是vocabulary size。
 
 图中的$W$是center word矩阵，以列为单位存储每一个单词作为center word的向量表示，$W \in R^{d*V}$。在一个训练批次只有一个center word，所以可以用独热向量$w_t$来表示。通过计算两者的乘积，我们就得到了当前想要的center word的向量$v_c$，$v_c \in R^{d*1}$。$v_c = w_t \cdot W$. 
 
-图中的$W'$是context word矩阵，以行为单位存储每一个单词作为context word的向量表示，$W' \in R^{V*d}$。通过计算该矩阵和center word向量的点乘我们可以得到一个中间产物$v_{tmp}$，$v_{tmp} = W' \cdot v_c$。对这个中间产物进行softmax，可以得到每一个词作为context word对应的概率，这个概率的向量表示标记为$p(x|c)$，是大小为$V$的向量$y_{pred}$，$p(x|c) = softmax(v_{tmp})$。我们希望在得到的向量$y_{pred}$中真正context word所对应的索引处的值（在上个模块例子中有4个context word）是大的，而其他索引处的值是小的。
+图中的$W'$是context word矩阵，以行为单位存储每一个单词作为context word的向量表示，$W' \in R^{V*d}$。通过计算该矩阵和center word向量的内积我们可以得到一个中间产物$v_{tmp}$，$v_{tmp} = W' \cdot v_c$。对这个中间产物进行softmax，可以得到每一个词作为context word对应的概率，这个概率的向量表示标记为$p(x|c)$，是大小为$V$的向量$y_{pred}$，$p(x|c) = softmax(v_{tmp})$。我们希望在得到的向量$y_{pred}$中真正context word所对应的索引处的值（在上个模块例子中有4个context word）是大的，而其他索引处的值是小的。
 
 $W$和$W'$都是模型训练过程中需要学习的。
 
-<img src="w2v_theta.jpg" height="200">
+<img src="https://i.postimg.cc/4NV9fKGV/w2v-theta.jpg" height="200">
 
 之前提到每一个单词会有两个向量表示，即v (center word)和u (context word)，把这两个向量拼接起来（其实也可以相加）作为训练参数$\theta$，$\theta \in R^{2Vd}$。这里的$\theta$是一个非常长的向量，而不是一个矩阵。
 
@@ -151,15 +151,15 @@ $J'(\theta) = \prod_{t=1}^T \prod_{j = -m, j \ne 0}^m p(w_t|w_{t+j}; \theta)$
 
 We use negative log likelihood to turn the objective function into a loss function. 
 
-$J(\theta) = -\frac 1 {T} \sum_{t=1}^T \sum_{j = -m, j \ne 0}^m p(w_{t}|w_{t+j})$
+$J(\theta) = -\frac 1 {T} \sum_{t=1}^T \sum_{j = -m, j \ne 0}^m log p(w_{t}|w_{t+j})$
 
 ### Training Process训练过程
 
-<img src="w2v_cbow.png" height="500">
+<img src="https://i.postimg.cc/cJ4gBXnB/w2v-cbow.png" height="400">
 
 训练过程和skig-gram非常类似。
 
-When computing the hidden layer output, instead of directly copying the input vector of the input context word, the CBOW model takes the average of the vectors of the input context words, and use the product of the input→hidden weight matrix and the average vector as the output. 图中的$W$是context word矩阵，以列为单位存储每一个单词作为context word的向量表示，$W \in R^{d*V}$。如果在一个训练批次只考虑一个context word，可以用独热向量$x_t$来表示。通过计算两者的点乘，我们就得到了当前想要的context word的向量$v_{context}$，$v_{context} \in R^{d*1}$。$v_{context} = W \cdot x_t$. 但是，在context包含多个词的时候，通常会采用这多个context word所对应向量的平均值作为输入。$v_{context} = \frac{1}{2m} \sum_{j=-m \\\\ j \ne 0}^m W \cdot x_j$.
+When computing the hidden layer output, instead of directly copying the input vector of the input context word, the CBOW model takes the average of the vectors of the input context words, and use the product of the input→hidden weight matrix and the average vector as the output. 图中的$W$是context word矩阵，以列为单位存储每一个单词作为context word的向量表示，$W \in R^{d*V}$。如果在一个训练批次只考虑一个context word，可以用独热向量$x_t$来表示。通过计算两者的内积，我们就得到了当前想要的context word的向量$v_{context}$，$v_{context} \in R^{d*1}$。$v_{context} = W \cdot x_t$. 但是，在context包含多个词的时候，通常会采用这多个context word所对应向量的平均值作为输入。$v_{context} = \frac{1}{2m} \sum_{j=-m \\\\ j \ne 0}^m W \cdot x_j$.
 
 
 
@@ -169,7 +169,7 @@ When computing the hidden layer output, instead of directly copying the input ve
 
 The hierarchical softmax encodes the language model’s output softmax layer into a tree hierarchy, where each leaf is one word and each internal node stands for relative probabilities of the children nodes.
 
-<img src="w2v_hs.png" height="200">
+<img src="https://i.postimg.cc/rmsVKHt7/w2v-hs.png" height="200">
 
 An example path from root to w2 is highlighted. $p^w$ means the path from the root node to the leaf node.  In the example shown, the length of the path $l(w2)$ = 4. $n(w, j)$ means the j-th unit on the path from root to the word w. $d_j^w \in \{0,1\}$ stands for the encoding of j-th node in the path $p^w$. $\theta_j^w$ is the vector of j-th node in the path $p^w$.
 
@@ -261,11 +261,11 @@ PV-DM is analogous to Word2Vec CBOW. The doc-vectors are obtained by training a 
 
 DM模型在训练时，首先将每个文档ID和语料库中的所有词初始化一个K维的向量，然后将文档向量和上下文词的向量输入模型，隐层将这些向量累加（或取均值、或直接拼接起来）得到中间向量，作为输出层softmax的输入。在一个文档的训练过程中，文档ID保持不变，共享着同一个文档向量，相当于在预测单词的概率时，都利用了整个文档的语义。
 
-<img src="d2v_dm.png">
+<img src="https://i.postimg.cc/t7QpvCmH/d2v-dm.png">
 
 在这个图中，作者貌似只说了用前文的词去预测后文的词，比如在这个例子中"the cat sat"是"on"的前文。这个实际上具有一定的误导性。在原paper的损失函数仍然是包含了一个center word的前后文的。 
 
-<img src="d2w_paper.png">
+<img src="https://i.postimg.cc/pdG9GzQb/d2w-paper.png">
 
 
 
@@ -275,7 +275,7 @@ DM模型在训练时，首先将每个文档ID和语料库中的所有词初始�
 
 PV-DBOW is analogous to Word2Vec SG. The doc-vectors are obtained by training a neural network on the synthetic task of predicting a target word just from the full document’s doc-vector.名字起得比较搞笑，PV-DM实际上对应的是word2vec中的SG模式。在每次迭代的时候，从文本中采样得到一个窗口，再从这个窗口中随机采样一个单词作为预测任务，让模型去预测，输入就是段落向量。
 
-<img src="d2v_dbow.png">
+<img src="https://i.postimg.cc/XNT56fRn/d2v-dbow.png">
 
 这种训练方式通常要比DM训练方式快很多，需要更少的储存空间，但是准确度不如DM高。
 
