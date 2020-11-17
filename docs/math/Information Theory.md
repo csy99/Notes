@@ -188,23 +188,6 @@ $$
 
 $i$阶矩被定义为$E[X^i]$，可以发现一阶矩正好就是期望。0阶矩被定义为1。
 
-### 概率的界
-
-#### Markov不等式
-
-假设$X$是一个非负随机变量(RV)，那么对于任何非负的实数$a$有$P(X \ge a) \le \frac {E[X]} a$。
-$$
-a*\mathbb{I}_{\{X \ge a\}} \le X \\\\
-E[a*\mathbb{I}_{\{X \ge a\}}] \le E[X] \\\\
-a E[\mathbb{I}_{\{X \ge a\}}] \le E[X] \\\\
-a \sum_{x \in X} [P(X=x) \mathbb{I}_{\{X \ge a\}}] \le E[X] \\\\
-a P(X \ge a) \le E[X] \\\\
-$$
-
-#### Chebyshev不等式
-
-假设$X$是一个随机变量(RV)，那么对于任何实数$a>1$，有$P(|X-E[X]| \ge a\sigma) \le \frac 1 {a^2}$.
-
 
 
 # 联合概率
@@ -489,6 +472,14 @@ $$
 3. $H(X, Y) = H(X) + H(Y); X \bot Y$
 4. $H(X, Y) = H(X); Y = g(X)$
 
+### 微分熵
+
+是从以离散随机变量所计算出的夏农熵推广，以连续型随机变量计算所得之熵。
+$$
+H(X) = \int_x p(x) log_2(\frac 1 {p(x)}) dx
+$$
+假设$X \sim \mathcal N(\mu, \sigma^2)$。那么$H(X) = \frac 1 2 log_2(2\pi e \sigma^2)$比特(bits)。
+
 
 
 # 互信息
@@ -671,9 +662,9 @@ $P(\hat y \ne y) = p(y=0)P(\hat y = 1|y=0) + p(y=1)P(\hat y = 0|y=1)$
 
 
 
-# Logistic Regression
+# 逻辑回归
 
-判别式模型。此模型不需要学习x的分布。
+逻辑回归(Logistic Regression)是判别式模型，不需要学习x的分布。
 $$
 \theta_i = \frac 1 {1 + e^{-x_i^Tw}}
 $$
@@ -743,6 +734,8 @@ $\pi$在这里是指该点属于哪一个高斯分布的先验概率。除次之
 
 Expectation Maximization (EM)。在概率模型中寻找参数最大似然估计或者最大后验估计的算法，其中概率模型依赖于无法观测的隐变量。
 
+在经过推导之后，可以发现当类别先验相同且方差为单位矩阵的时候，EM算法和KMeans实际上是一样的。
+
 ### 过程
 
 初始化先验概率均等，协方差矩阵为单位矩阵(Identity Matrix)。
@@ -780,6 +773,229 @@ E-step: 对于每个数据点，在已知$\theta_{t-1}$计算$z_i$的期望值
 
 M-step: 对于$z_i$求出$\theta_t$的最大似然
 
+
+
+# 概率边界
+
+实际情况下，我们有可能不知道$X_i$的真实分布。有一些定理可以帮助我们大致确定我们的估计有多少偏差。
+
+### 样本复杂度
+
+英文是sample complexity。为了达到错误率小于等于$\epsilon$的概率大于或等于$1 - \delta$所需要的样本数量。
+
+定理1（上界）：我们找到了一个算法能够在小于$n(\delta, \epsilon)$个样本数量的前提下达到错误率小于等于$\epsilon$的概率大于或等于$1 - \delta$。
+
+定理2（下界）：我们目前已经测试的所有算法达到错误率小于等于$\epsilon$的概率大于或等于$1 - \delta$都需要大于$n(\delta, \epsilon)$个样本数量。
+
+真正的样本数量就是介于下界(lower limit)和上界(upper limit)之间。
+
+拿多变量高斯分布举例。在iid的前提条件下，我们假设$X_i \sim \mathcal N(\mu, \sigma^2)$。我们对均值进行预测$\hat \mu = \frac 1 n \sum_i X_i$。那么得到的预测服从$\hat \mu \sim \mathcal N(\mu, \sigma^2/n)$。下面的推导假设$\mu = 0$。
+
+那么如何衡量这个预测？中间的第二步利用$y = \frac{x} {\sqrt{\sigma^2/n}}$进行了换元操作。
+$$
+P(|\hat \mu - \mu| \ge t) = 2 \int_t^{\infty} \frac {1} {\sqrt{2\pi\sigma^2/n}} exp(-\frac{x^2} {2\sigma^2/n}) dx\\\\
+= 2 \int_{t\sqrt{n/\sigma^2}}^{\infty} \frac {1} {\sqrt{2\pi}} exp(-\frac{y^2} {2}) dy\\\\
+= 2Q(t\sqrt{n/\sigma^2}) \le 2*exp(-t^2n/\sigma^2)
+$$
+这里的Q指的是Q函数，用于表示标准正态分布的尾部分布函数。有人也将此称为高斯尾(Gaussian tail)。
+$$
+Q(x) := \int_x^{\infty} \frac {1} {\sqrt{2\pi}} exp(-\frac{y^2} {2}) dy\\\\
+\le \int_x^{\infty} \frac {y} {x\sqrt{2\pi}} exp(-\frac{y^2} {2}) dy \\\\
+= \frac{exp(-x^2/2)} {x\sqrt{2\pi}} \\\\
+\le exp(-x^2/2) \ for \ x \ge \frac{1} {\sqrt{2\pi}}
+$$
+
+### 高斯尾边界
+
+英文是Gaussian tail bounds。令$X \sim \mathcal N(0,1)$。对于所有$t \ge 0$，
+$$
+P(X \ge t) \le e^{-t^2/2}
+$$
+
+### 马尔科夫不等式
+
+英文是Markov inequality。假设$X$是一个非负随机变量(RV)，那么对于任何非负的实数$a$有$P(X \ge a) \le \frac {E[X]} a$。（$X \ge 0$，$t \ge 0$）
+$$
+a*\mathbb{I}_{\{X \ge a\}} \le X \\\\
+E[a*\mathbb{I}_{\{X \ge a\}}] \le E[X] \\\\
+a E[\mathbb{I}_{\{X \ge a\}}] \le E[X] \\\\
+a \sum_{x \in X} [P(X=x) \mathbb{I}_{\{X \ge a\}}] \le E[X] \\\\
+a P(X \ge a) \le E[X] \\\\
+$$
+
+### 切比雪夫不等式
+
+英文是Chebyshev inequality。假设$X$是一个随机变量(RV)，那么对于任何实数$a>1$（否则不是很有意义，因为RHS会大于1），有$P(|X-E[X]| \ge a\sigma) \le \frac 1 {a^2}$。
+
+这里Chebyshev概率边界只不过是Markov概率边界的拓展，假设$\hat \mu = \frac 1 n \sum_i X_i$，并且$\mu = E[X_i]$
+$$
+P(|\hat \mu - \mu| \ge \delta) \le \frac {\sigma^2} {n\delta^2}
+$$
+证明如下，（第二行是通过马尔科夫不等式推导得来）
+$$
+P(|\hat \mu - \mu| \ge \delta) = P((\hat \mu - \mu)^2 \ge (\delta)^2) \\\\
+\le \frac {E[(\hat \mu - \mu)^2]} {\delta^2} \\\\
+= \frac {var(\hat \mu)} {\delta^2} \\\\
+= \frac {\sigma^2} {n\delta^2}
+$$
+
+### 切尔诺夫界
+
+英文是Chernoff Bound。对于随机变量$X$和 实数$s \ge 0$，有
+$$
+P(X \ge t) \le e^{-st} E[e^{sX}]
+$$
+证明如下
+$$
+\mathcal I\{X \ge t\} \le e^{s(X-t)} \\\\
+P(X \ge t) \le E[e^{s(X-t)}] = e^{-st}E[e^{sX}]\\\\
+$$
+
+下图非常直观的显示LHS和RHS的大小关系。绿色的线代表证明中的LHS，红色的代表证明中的RHS。
+
+<img src="https://i.postimg.cc/hGP61NFz/proof-chernoff-bound.png" height=150>
+
+### 霍夫丁不等式
+
+英文是Hoeffding's Inequality。假设$X_i$都是iid的随机变量且$X_i \in [a,b]$。$\hat \mu = \frac 1 n \sum_i X_i$，并且$\mu = E[X_i]$。
+$$
+P(|\hat \mu - \mu| \ge t) \le 2*exp(-\frac{2t^2n} {(b-a)^2})
+$$
+如果$X_i \sim \mathcal N(\mu, \sigma^2)$，那么
+$$
+P(|\hat \mu - \mu| \ge t) \le 2*exp(-\frac{t^2n} {\sigma^2})
+$$
+
+### 大数定律
+
+英文是Law of Large Numbers (LLN)，也被称作大数法则。根据这个定律知道，样本数量越多，则其算术平均值就有越高的概率接近期望值。当然，期望不能是发散的。
+
+我们先介绍弱形式。即假设$X_i$都是iid的随机变量，那么从概率的角度$\frac 1 n \sum_i X_i$会逐渐收敛到$E[X_i]$。
+
+证明如下，
+$$
+P(|\hat \mu - \mu| \ge \delta) \le \frac {\sigma^2} {n\delta^2} \\\\
+lim_{n -> \infty} P(|\frac 1 n \sum_i X_i - E[X_i]| \ge \delta) \le lim_{n -> \infty} \frac {\sigma^2} {n\delta^2} = 0 \\\\
+$$
+我们再介绍强形式。即假设$X_i$都是iid的随机变量，那么$\frac 1 n \sum_i X_i$一定会收敛到$E[X_i]$。
+$$
+P(lim_{n -> \infty} \frac 1 n \sum_i X_i = E[X_i]) = 1
+$$
+
+### 中心极限定理
+
+无人不知的Central Limit Theorem (CLT)。
+
+假设$X_i$都是iid的随机变量，均值为$\mu$，方差为$\sigma^2$。那么$\sqrt{n}(\hat \mu - \mu)$会趋近于服从正态分布$\mathcal N(0, \sigma^2)$。
+
+下面的图例是对抛1、2、10、50次抛硬币结果的统计。
+
+<img src="https://i.postimg.cc/mkPM646F/CLT.png" height=160>
+
+
+
+# K-L散度
+
+我们使用Kullback-Leibler Divergence来衡量两个分布$p$和$q$究竟有多相似。需要注意的是，需要对所有$x$满足$q(x) \ne 0$，否则K-L散度不存在。另外，K-L散度不是距离，并不具有对称性。
+$$
+D(p||q) = \sum p(x) log \frac {p(x)} {q(x)} \\\\
+D(p||q) = \int p(x) log \frac {p(x)} {q(x)} dx
+$$
+假设有$P$和$Q$两个分布，均为iid。我们发现，当$p$是正确标签的时候，K-L散度实际上是对数似然比例的期望。
+$$
+D(p||q) = E_p[log \frac {p(x)} {q(x)}]
+$$
+我们可以通过计算$D(p||q)$找到，在服从先验假设和观测的前提下，最有可能的分布。更加便捷的是，K-L散度在p和q维度上都是凸优化问题。
+$$
+min_p D(p||q)
+$$
+**性质**
+
+1. 非负性，当且仅当对于所有$x$有$p(x) = q(x)$的时候，散度为0
+
+对于性质1，我们可以进行证明。
+$$
+-D(p||q) = -\sum p(x) log \frac {p(x)} {q(x)} \\\\
+= \sum p(x) log \frac {q(x)} {p(x)} \\\\
+\le log (\sum p(x)\frac {q(x)} {p(x)}) \\\\
+= 0
+$$
+证明后半句，需要用到下面提到的詹森不等式。
+
+### 假设检验中的误差指数
+
+英文是Error exponents in hypothesis testing，有时候也被称为Chernoff-Stein Lemma。假设观察到n个i.i.d.来自p或q的样本，并且$P(\hat y=q | y=p) \le \epsilon$，那么
+$$
+P(\hat y=p | y=q) \ge exp(-nD(p||q))
+$$
+相当于我们在固定type-I error的时候，type-II error的下降速率与指数为n和K-L散度的数相关。
+
+误差指数的计算如下
+$$
+lim_{n->\infty} \frac {-ln P_{error}} {n} = -D(p||q)
+$$
+
+### 詹森不等式
+
+Jensen's inequality。对于任意凸函数$f$和随机变量$X$
+$$
+E[f(X)] \ge f(E[X]) \\\\
+\sum p(x)f(x) \ge f(\sum xp(x))
+$$
+**证明**
+
+对于任何一组$x$，有
+$$
+p(x_1)f(x_1) + p(x_2)f(x_2) \ge f(x_1p(x_1) + x_2p(x_2))
+$$
+接下来，可以使用induction证明。
+
+### 与信息熵和互信息的关系
+
+我们知道互信息是
+$$
+I(Y;X) = \sum_{x, y} p(x, y) log(\frac{p(x, y)} {p(x)p(y)})\\\\
+= E[log(\frac{p(x, y)} {p(x)p(y)})]
+$$
+那么，我们可以将K-L散度中的$P$看成是$X$和$Y$的联合概率，$Q$看成是$X$和$Y$两个边缘分布的乘积。
+$$
+I(Y;X) = D(p(x,y) || p(x)p(y))
+$$
+由熵的性质，我们也可以推出K-L散度的非负性。我们接下来看看熵的第二个性质$H(x) \le log_2(|\mathcal X|)$。
+
+我们假设$X$是离散且有限的，$q(x) = \frac 1 {|\mathcal X|}$，即类别概率相同。
+$$
+D(p||q) = \sum p(x) log \frac {p(x)} {q(x)} \\\\
+= \sum p(x) (log(|\mathcal X|) + log(p(x))) \\\\
+= log(|\mathcal X|) - H(X) \\\\
+\ge 0
+$$
+我们通过上面的推导也同样得出了熵的第二个性质。
+
+### 法诺不等式
+
+英文是Fano's Inequality，有时候也称作the Fano converse。
+
+<img src="https://i.postimg.cc/rwW8xFS8/fano-inequality.png" height=100>
+
+假设我们有如上图所示的模型。
+$$
+P(\hat Y \ne Y) \ge \frac {H(Y|x) - 1} {log(|\mathcal Y|)}
+$$
+我们将错误定义为$E = \mathcal I_{\{\hat Y \ne Y\}}$。证明如下。
+$$
+H(E,Y|\hat Y) = H(Y|\hat Y) + H(E|Y,\hat Y) \\\\
+= H(Y|\hat Y) \\\\
+\ge H(Y|x) \\\\
+$$
+我们将信息熵以另一种方式拆解。
+$$
+H(E,Y|\hat Y) = H(E|\hat Y) + H(Y|E,\hat Y) \\\\
+\le 1 + H(Y|E,\hat Y) \\\\
+= 1 + P(E=1)H(Y|E=1,\hat Y) + P(E=0)H(Y|E=0,\hat Y) \\\\
+\le 1 + P(\hat Y \ne Y)H(Y|E=1,\hat Y) \\\\
+\le 1 + P(\hat Y \ne Y)log(|\mathcal Y|)
+$$
 
 
 

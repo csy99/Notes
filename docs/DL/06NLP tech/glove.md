@@ -19,3 +19,10 @@ $J=\sum_{i,j=1}^V f(X_{ij}) (w_i^T \tilde w_j + b_i + \tilde b_j - logX_{ij})$
 ### intrinsic word vector evaluation 
 
 word vector analogies 
+
+
+
+# Reference
+
+- [GloVe: Global Vectors for Word Representation](https://nlp.stanford.edu/pubs/glove.pdf), Jeffrey Pennington, Richard Socher, Christopher D. Manning. 2014. 
+- 

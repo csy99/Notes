@@ -1,3 +1,11 @@
+更新：
+9/4/20
+做了关于SG模型最后计算loss的一些补充。对doc2vec损失计算部分出现的错误进行了订正。
+
+11/16/20
+
+补充了部分近似训练的内容
+
 # Represent the Meaning of a Word
 
 ### WordNet
@@ -53,7 +61,7 @@ There are certain differences between the two. The Distributional Similarity emp
 
 
 
-# Loss Function损失函数
+# 损失函数Loss Function
 
 Softmax function: map from $R^v$ to a probability distribution(从实数空间到概率分布的标准映射方法)。公式分子部分保证将这个数转化成一个正数，分母部分保证所有概率之和为1。
 
@@ -99,11 +107,13 @@ $$
 
 
 
-# Training Algorithms训练方法
+# 训练方法
 
-## Skip-grams (SG)
+训练方法(Training Algorithms)包括两种：跳字模型和连续词袋模型。
 
-Predict context words given target (position independent). 
+## 跳字模型
+
+英文是Skip-grams (SG)。Predict context words given target (position independent). 
 
 <img src="https://i.postimg.cc/Y24FPnyX/w2v-context.png" height="200">
 
@@ -113,17 +123,20 @@ Predict context words given target (position independent).
 
 通过center word和context word组成一组训练数据，喂给word2vec模型。
 
-### Objective Function目标函数
+### 目标函数Objective Function
 
-Max the probability of any context word given the current center word. $\theta$ represents all variables we will optimize. The number of total words is T. Window size is m. 
+给定当前中心词时，最大化上下文词的概率。 $\theta$ 代表我们需要优化的参数。给定一个长度为$T$的文本序列。窗口大小是m。 
 
-$J'(\theta) = \prod_{t=1}^T \prod_{j=-m,j \ne 0}^m p(w_{t+j}|w_t; \theta)$
+$$
+J'(\theta) = \prod_{t=1}^T \prod_{j=-m,j \ne 0}^m p(w_{t+j}|w_t; \theta)
+$$
+我们使用负对数似然将目标函数转化为损失函数。
 
-We use negative log likelihood to turn the objective function into a loss function. 
+$$
+J(\theta) = -\frac 1 {T} \sum_{t=1}^T \sum_{j=-m,j \ne 0}^m log p(w_{t+j}|w_t)
+$$
 
-$J(\theta) = -\frac 1 {T} \sum_{t=1}^T \sum_{j=-m,j \ne 0}^m log p(w_{t+j}|w_t)$
-
-### Training Process训练过程
+### 训练过程Training Process
 
 <img src="https://i.postimg.cc/FHxkS27K/w2v-skipgram.jpg" height="500">
 
@@ -139,11 +152,11 @@ $W$和$W'$都是模型训练过程中需要学习的。
 
 之前提到每一个单词会有两个向量表示，即v (center word)和u (context word)，把这两个向量拼接起来（其实也可以相加）作为训练参数$\theta$，$\theta \in R^{2Vd}$。这里的$\theta$是一个非常长的向量，而不是一个矩阵。
 
-## Continuous Bag of Words (CBOW)
+## 连续词袋模型
 
-Predict target word from bag-of-words context. 
+英文是Continuous Bag of Words (CBOW)。Predict target word from bag-of-words context. 
 
-### Objective Function目标函数
+### 目标函数Objective Function
 
 Max the probability of center word given its context words. $\theta$ represents all variables we will optimize. The number of total words is T. Window size is m. 
 
@@ -153,7 +166,7 @@ We use negative log likelihood to turn the objective function into a loss functi
 
 $J(\theta) = -\frac 1 {T} \sum_{t=1}^T \sum_{j = -m, j \ne 0}^m log p(w_{t}|w_{t+j})$
 
-### Training Process训练过程
+### 训练过程Training Process
 
 <img src="https://i.postimg.cc/cJ4gBXnB/w2v-cbow.png" height="400">
 
@@ -163,33 +176,48 @@ When computing the hidden layer output, instead of directly copying the input ve
 
 
 
-# Improvement提升训练效率
+# 近似训练
 
-## Hierarchical SoftMax
+Word2vec在计算损失的时候使用到了softmax，所以需要考虑词典中的所有单词。对于上百万词的较大词典，计算梯度的开销会非常大。为了降低计算复杂度，研究人员提出了层序softmax和负采样两种近似训练方法。
 
-The hierarchical softmax encodes the language model’s output softmax layer into a tree hierarchy, where each leaf is one word and each internal node stands for relative probabilities of the children nodes.
+## 层序SoftMax
+
+英文是Hierarchical softmax。层序softmax将语言模型的输出softmax层编码为树形层次结构，其中每个叶子代表词典中一个单词，每个内部节点代表子节点的相对概率。
 
 <img src="https://i.postimg.cc/rmsVKHt7/w2v-hs.png" height="200">
 
-An example path from root to w2 is highlighted. $p^w$ means the path from the root node to the leaf node.  In the example shown, the length of the path $l(w2)$ = 4. $n(w, j)$ means the j-th unit on the path from root to the word w. $d_j^w \in \{0,1\}$ stands for the encoding of j-th node in the path $p^w$. $\theta_j^w$ is the vector of j-th node in the path $p^w$.
+图中从根节点到$w_2$的示例路径被突出显示。$p^w$ 根节点到叶节点的路径。我们使用$l(w)$代表根结点到叶节点的路径（包括根节点和叶节点）上的结点数。例如，在图示中，$l(w_2)$是4。使用$n(w, j)$ 表示到叶节点$w$路径中的第$j$个节点，该节点的背景词向量是$u_{n(w, j)}$。$d_j^w \in \{0,1\}$ 是$p^w$上第$j$个节点的编码。$\theta_j^w$ 是$p^w$上第$j$个节点的向量。
 
-In the hierarchical softmax model, there is no output vector representation for words. 相当于是去掉了模型的隐藏层。原因是从hidden layer到output layer的矩阵运算太多了。
+在此模型中，没有单词的输出矢量表示。相当于是去掉了模型的隐藏层。原因是从hidden layer到output layer的矩阵运算太多了。
 
-使用了哈夫曼树，则时间复杂度就从$O(|V|)$降到了$O(log_2|V|)$。另外，由于哈夫曼树的特点，词频高的编码短，这样就更加快了模型的训练过程。
+使用了哈夫曼树，时间复杂度就从$O(|V|)$降到了$O(log_2|V|)$。另外，由于哈夫曼树的特点，词频高的编码短，进一步加快了模型的训练过程。
 
-// TODO 补充关于SG和CBOW的推导
+### 损失函数Loss Function
 
-## Negative Sampling负采样
+#### with SG
+
+条件概率可以近似表示为
+$$
+P(w_o|w_c) = \prod_{j=1}^{l(w_o)-1} \sigma\left( [\![  n(w_o, j+1) = \text{leftChild}(n(w_o,j)) ]\!] \cdot \boldsymbol{u}_{n(w_o,j)}^\top \boldsymbol{v}_c\right),
+$$
+其中，$[\![ x]\!]$中的值如果为真，则表达式结果为1，否则结果为-1。
+
+我们需要将中心词的向量和根节点到预测背景词路径上的非叶节点向量一一求内积。由于$\sigma(x)+\sigma(-x) = 1$，给定中心词$w_c$生成词典中任一词的条件概率之和为1这一条件也将满足。
+
+#### with CBOW
+
+## 负采样Negative Sampling
 
 每次训练不需要更新所有负样本的权重，而只更新其中的k个。
 
-For Unigram Model, the power of 3/4 works best. Word2vec则在词频基础上取了0.75次幂，减小词频之间差异过大所带来的影响，使得词频比较小的负样本也有机会被采到。
+Word2vec在词频基础上取了0.75次幂，减小词频之间差异过大所带来的影响，使得词频比较小的负样本也有机会被采到。
 
-$weight(w) = count(w)^{0.75}/\sum_{i=1}^V count(i)^{0.75}$
+$$
+weight(w) = count(w)^{0.75}/\sum_{i=1}^V count(i)^{0.75} \\\\
+P(w) = U(w)^{0.75} / Z
+$$
 
-$P(w) = U(w)^{0.75} / Z$
-
-### Loss Function损失函数
+### 损失函数Loss Function
 
 #### with SG
 
@@ -205,10 +233,11 @@ This maximizes probability that real outside word appears, minimize probability 
 
 
 
-Consider a pair (w, c) of word and context. Did this pair come from the training data? Let’s denote by P(D = 1|w, c) the probability that (w, c) came from the corpus data. Correspondingly, P(D = 0|w, c) will be the probability that (w, c) did not come from the corpus data. First, let’s model P(D = 1|w, c) with the sigmoid function
+考虑一对单词(w,c)和上下文。使用$P(D = 1 | w,c,\theta)$表示(w,c)来自语料数据的概率。相应地，$P(D = 0 | w,c,\theta)$将是(w,c)不是来自语料数据的概率。
 
-$P(D = 1 | w,c,\theta) = 1/(1+exp(-v_c^Tv_w))$
-
+$$
+P(D = 1 | w,c,\theta) = \sigma(u_o^Tv_c) = 1/(1+exp(-u_o^Tv_c))
+$$
 Now, we build a new objective function that tries to maximize the probability of a word and context being in the corpus data if it indeed is, and maximize the probability of a word and context not being in the corpus data if it indeed is not. We take a simple maximum likelihood approach of these two probabilities. (Here we take θ to be the parameters of the model, and in our case it is V and U.)
 $$
 \theta = argmax_\theta \prod_{(w,c) \in D} P(D=1| w,c,\theta) \prod_{(w,c) \in \widetilde D} P(D=0| w,c,\theta)  \\\\
@@ -253,7 +282,7 @@ Doc2vec被用来解决这个问题，在使用向量表示段落或者文本的�
 
 1. missing new words (impossible to keep up to date)缺少新词
 
-## Training Algorithms训练方法
+## 训练方法Training Algorithms
 
 ### Distributed Memory (PV-DM)
 
@@ -358,5 +387,6 @@ plotVec(ax1, xtrain_tsne, ytrain, title="training")
 - [doc2vec model](https://radimrehurek.com/gensim/models/doc2vec.html#module-gensim.models.doc2vec), gensim
 - [Word2vec和Doc2vec原理理解并结合代码分析](https://blog.csdn.net/mpk_no1/article/details/72458003), mpk_no1
 - [Distributed Representations of Sentences and Documents](https://arxiv.org/pdf/1405.4053.pdf), Quoc Le & Tomas Mikolov
-- [一篇通俗易懂的word2vec](https://zhuanlan.zhihu.com/p/35500923), susht,NLP Weekly
+- [一篇通俗易懂的word2vec](https://zhuanlan.zhihu.com/p/35500923), susht, NLP Weekly
+- [Dive Into Deep Learning](http://zh.gluon.ai/chapter_recurrent-neural-networks/rnn.html)，第10章
 
