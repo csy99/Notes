@@ -70,6 +70,8 @@ $p(x) = px + (1-p)(1-x); \ x \in \{0,1\}$
 
 应用场景为投篮投进的概率。
 
+$var(X) = p(1-p)$
+
 #### Geometric
 
 $p(x) = p(1-p)^x$
@@ -896,7 +898,7 @@ $$
 
 # K-L散度
 
-我们使用Kullback-Leibler Divergence来衡量两个分布$p$和$q$究竟有多相似。需要注意的是，需要对所有$x$满足$q(x) \ne 0$，否则K-L散度不存在。另外，K-L散度不是距离，并不具有对称性。
+我们使用Kullback-Leibler Divergence来衡量两个分布$p$和$q$究竟有多相似。对数函数的底不是很重要，只要在计算时保持一致即可。如果是以$e$为底，那么单位是nats；如果是以2为底，那么单位是bits。需要注意的是，需要对所有$x$满足$q(x) \ne 0$，否则K-L散度不存在。另外，K-L散度不是距离，并不具有对称性。
 $$
 D(p||q) = \sum p(x) log \frac {p(x)} {q(x)} \\\\
 D(p||q) = \int p(x) log \frac {p(x)} {q(x)} dx
@@ -991,12 +993,140 @@ $$
 我们将信息熵以另一种方式拆解。
 $$
 H(E,Y|\hat Y) = H(E|\hat Y) + H(Y|E,\hat Y) \\\\
+\le H(E) + H(Y|E,\hat Y) \\\\ \\\\
 \le 1 + H(Y|E,\hat Y) \\\\
 = 1 + P(E=1)H(Y|E=1,\hat Y) + P(E=0)H(Y|E=0,\hat Y) \\\\
-\le 1 + P(\hat Y \ne Y)H(Y|E=1,\hat Y) \\\\
+= 1 + P(\hat Y \ne Y)H(Y|E=1,\hat Y) \\\\
+\le 1 + P(\hat Y \ne Y)H(Y) \\\\
 \le 1 + P(\hat Y \ne Y)log(|\mathcal Y|)
 $$
 
+
+
+# 自编码器
+
+### 引子：伯努利实验的观察
+
+在n次伯努利试验下，根据霍夫丁不等式，我们可以推出
+$$
+P(|k - n\theta| \ge m) \le 2*exp(-2m^2/n)
+$$
+现在有一种彩票，序列是100次伯努利实验结果的拼接。$X \sim Bern(0.9)$。
+
+假设我们赢得彩票的方式是猜对编码。假设我们只买一张，那么我们应该买序列全是1的彩票，因为其概率最大。假设我们可以多买100张彩票，那么我们应该将序列中包含1个0的彩票也全部买下。购买顺序以此类推。
+
+假设我们赢得彩票的方式是猜对中奖序列中1的个数。那我们应该猜90。
+
+<img src="https://i.postimg.cc/4dDZZNH3/coin-binomial.png" height=280>
+
+如果对信息熵进行绘图，我们会发现他的形状会和第一张图C(n,k)的形状一模一样。
+
+### 构造
+
+<img src="https://i.postimg.cc/jdGmmgmQ/autoencoder.png" height=200>
+
+自编码器(autoencoder)由编码器和解码器两部分组成。编码器负责压缩，解码器负责还原。我们的目标是使得编码的表示更加高效，即在尽可能减小信息损失的前提下，中间产物$y$的大小应该远小于输入$x$。
+
+### 信源编码定理
+
+Shannon的信源编码定理(source coding theorem)是量化信息的基础。我们考虑离散且有限的随机变量$X$。n个iid随机变量，每个变量的信息熵都是$H(X)$。这组变量可以压缩为$nH(X)$ bits的大小，而不用太担心有过多的信息损失。换言之，如果压缩的大小小于这个临界点，那么一定会有信息损失。
+
+接下来是进一步解释该定理，不过不是严格的证明。
+
+我们假设encoder的输入$x \in \{0, 1\}^n$并将其映射到$y \in \{0, 1\}^m$。数据是$X \sim Bern(0.8)$。
+
+我们先看$n = 1000$的情况。假设我们自编码器的波动容纳是100，也就是说当$x$中包含少于700个1，或者多于800个1的时候自编码器会失效。我们下面计算自编码器失效的概率。
+$$
+P(|k-n\theta| \ge t) \le 2*exp(-2t^2/n) \\\\
+P(|k-800| \ge 100) \le 2*exp(-2*100^2/1000) = 4.12*10^{-9} \\\\
+$$
+在之前，我们需要对所有序列编码。
+$$
+\sum_{k=1}^{1000} C(1000, k) = 2^{1000}
+$$
+我们现在只需要对规定范围内的序列进行编码。
+$$
+\sum_{k=700}^{900} C(1000, k) \approx 2^{877}
+$$
+目前的压缩率是$877/1000 = 0.877$。
+
+<img src="https://i.postimg.cc/4y4ScDcg/source-coding-1000.png" height=240>
+
+改变出现在指数项是量级上的改变！
+
+我们再来看$n = 100,000$的情况。假设我们自编码器的波动容纳是1000，也就是说当$x$中包含少于700个1，或者多于800个1的时候自编码器会失效。我们下面计算自编码器失效的概率。
+$$
+P(|k-n\theta| \ge t) \le 2*exp(-2t^2/n) \\\\
+P(|k-800| \ge 100) \le 2*exp(-2*1000^2/100000) = 4.12*10^{-9} \\\\
+$$
+我们需要编码的序列范围是
+$$
+\sum_{k=79000}^{81000} C(100000, k) \le 2000*C(100000,79000) \approx 2^{74163}
+$$
+目前的压缩率是$74163/100k = 0.74163$。我们的信息熵是0.722 bits。已经非常接近了。
+
+我们总结一下，当$n$足够大，始终保持自编码器的波动容纳是$t = c \sqrt n$，那么自编码器失效的概率是
+$$
+P(|k-n\theta| \ge t) \le 2*exp(-2t^2/n) = 2*exp(-2c^2)
+$$
+我们需要编码的序列是
+$$
+\sum_{k=n\theta-t}^{n\theta+t} C(n, k) \approx 2t*C(n, n\theta) \\\\
+\approx 2^{log_2(2t)} 2^{nH(X)}
+$$
+由此得知，压缩率大约是$H(X)$。
+
+已知斯特灵公式(Stirling's approximation)
+$$
+n! = \sqrt{2\pi n}*(n/e)^n \approx n^n
+$$
+我们来看看上式后半部分成立的原因。
+$$
+log[C(n, n\theta)] = log[\frac{n!} {k!(n-k)!}] \\\\
+\approx log[\frac{n^n} {k^k(n-k)^{(n-k)}}] \\\\
+= nlog(n) - klog(k) - (n-k)log(n-k) \\\\
+= (n-k)log(n) + klog(n) - klog(k) - (n-k)log(n-k) \\\\
+= (n-k)log(\frac{n} {n-k}) + k log(\frac{n} {k})
+$$
+将$k = \theta n$代入上式，有
+$$
+log[C(n, \theta n)] = n\theta log(\frac{1} {\theta}) + n(1-\theta)log(\frac{1} {1-\theta})
+$$
+
+### 渐近等分性质
+
+在信息论中，渐近均分性质(Asymptotic equipartition property, AEP)是随机源输出样本的一般性质。对于数据压缩理论中使用的典型集合的概念而言，这是基础。
+
+我们只关心熵典型集
+$$
+A_{\epsilon}^n = \{x:|\frac 1 n log(\frac 1 {p(x)}) - H(X)| \le \epsilon \}
+$$
+**性质**
+
+对于$n$足够大时，
+
+1. $P(A_{\epsilon}^n) \ge 1-\epsilon$
+2. $|A_{\epsilon}^n| \le 2^{n(H(X)+\epsilon)}$
+
+3. $|A_{\epsilon}^n| \ge (1-\epsilon) 2^{n(H(X)-\epsilon)}$
+
+对于性质2，有如下证明
+$$
+1 = \sum_{x \in \mathcal X} p(x) \\\\
+\ge \sum_{x \in A_{\epsilon}^n} p(x) \\\\
+\ge \sum_{x \in A_{\epsilon}^n} 2^{-n(H(X)+\epsilon)} \\\\
+= 2^{-n(H(X)+\epsilon)}|A_{\epsilon}^n| \\\\
+
+可得|A_{\epsilon}^n| \le 2^{n(H(X)+\epsilon)}
+$$
+对于性质3，有如下证明
+$$
+1-\epsilon < P(x \in A_{\epsilon}^n) \\\\
+\le \sum_{x \in A_{\epsilon}^n} 2^{-n(H(X)-\epsilon)} \\\\
+= 2^{-n(H(X)-\epsilon)}|A_{\epsilon}^n| \\\\
+
+可得|A_{\epsilon}^n| \ge (1-\epsilon) 2^{n(H(X)-\epsilon)}
+$$
 
 
 

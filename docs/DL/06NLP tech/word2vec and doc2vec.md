@@ -2,11 +2,13 @@
 9/4/20
 做了关于SG模型最后计算loss的一些补充。对doc2vec损失计算部分出现的错误进行了订正。
 
-11/16/20
+11/17/20
 
 补充了部分近似训练的内容
 
-# Represent the Meaning of a Word
+# 词义表示
+
+在NLP中，最基础的问题就是如何表示一个词、句子(Represent the Meaning of a Word)。接下来介绍的几种方法各有优劣，不过也是不断进步的过程。
 
 ### WordNet
 
@@ -231,14 +233,7 @@ $J_{neg}(o, v_c, U) = -log \sigma(u_o^Tv_c) - \sum_{k=1}^K log \sigma(-u_k^T \cd
 
 This maximizes probability that real outside word appears, minimize probability that random words appear around center word. 
 
-
-
-考虑一对单词(w,c)和上下文。使用$P(D = 1 | w,c,\theta)$表示(w,c)来自语料数据的概率。相应地，$P(D = 0 | w,c,\theta)$将是(w,c)不是来自语料数据的概率。
-
-$$
-P(D = 1 | w,c,\theta) = \sigma(u_o^Tv_c) = 1/(1+exp(-u_o^Tv_c))
-$$
-Now, we build a new objective function that tries to maximize the probability of a word and context being in the corpus data if it indeed is, and maximize the probability of a word and context not being in the corpus data if it indeed is not. We take a simple maximum likelihood approach of these two probabilities. (Here we take θ to be the parameters of the model, and in our case it is V and U.)
+Now, we build a new objective function that tries to maximize the probability of a word and context being in the corpus data if it indeed is, and minimize the probability of a word and context not being in the corpus data if it indeed is not. We take a simple maximum likelihood approach of these two probabilities. (Here we take θ to be the parameters of the model, and in our case it is V and U.)
 $$
 \theta = argmax_\theta \prod_{(w,c) \in D} P(D=1| w,c,\theta) \prod_{(w,c) \in \widetilde D} P(D=0| w,c,\theta)  \\\\
 = argmax_\theta \prod_{(w,c) \in D} P(D=1| w,c,\theta) \prod_{(w,c) \in \widetilde D} 1-P(D=1| w,c,\theta)  \\\\
@@ -248,15 +243,32 @@ $$
 $$
 $\widetilde D$ stands for a "false" corpus. For example, the unnatural sentences is one of such corpus. 
 
-Our new objective function:
+考虑一对单词(w,c)和上下文。使用$P(D = 1 | w,c,\theta)$表示(w,c)来自语料数据的概率。相应地，$P(D = 0 | w,c,\theta)$将是(w,c)不是来自语料数据的概率。
 
-$log \sigma(u_{c-m+j}^T \cdot v_c) + \sum_{k=1}^K log \sigma(-\widetilde u_k^T \cdot v_c)$.
+$$
+P(D = 1 | w,c,\theta) = \sigma(u_o^Tv_c) = \frac 1 {1+exp(-u_o^Tv_c)}
+$$
+如果只考虑正类样本，可以建立这么一个模型
+$$
+J' = \prod_{t=1}^T \prod_{j = -m, j \ne 0}^m P(D=1 | w^{(t)}, w^{(t+j)})
+$$
+如果我们尝试对这个联合概率取最大值，那么会让所有词向量相等且值为正无穷。这样的优化没有意义。所以我们需要进行负采样。设背景词$w_0$出现在中心词的窗口为事件$P$，我们根据分布$P(w)$采样$k$个未出现在该窗口中的词，即噪声词(负样例)。设噪声词$w_k$不出现在中心词的窗口为事件$N_k$。我们可以得到以下模型
+$$
+\prod_{t=1}^T \prod_{j = -m, j \ne 0}^m P(w^{(t+j)} | w^{(t)})
+$$
+其中的条件概率可以被表示为
+$$
+P(w^{(t+j)} | w^{(t)}) =  P(D=1 | w^{(t)},w^{(t+j)}) \prod_{k=1, w_k \sim P(w)}^K P(D=0 | w^{(t)}, w_k)
+$$
+假设文本序列中时间步$t$的词在词典中索引是$i_t$，噪声词$w_k$的索引是$h_k$。那么对数损失可以表达成为
+$$
+-logP(w^{(t+j)} | w^{(t)}) = -P(D=1 | w^{(t)},w^{(t+j)}) - \sum_{k=1, w_k \sim P(w)}^K P(D=0 | w^{(t)}, w_k) \\\\
+= -log(\sigma(u_{i_{t+j}}^T v_{i_t})) - \sum_{k=1, w_k \sim P(w)}^K log(1-\sigma(u_{h_k}^T v_{i_t})) \\\\
+= -log(\sigma(u_{i_{t+j}}^T v_{i_t})) - \sum_{k=1, w_k \sim P(w)}^K log(\sigma(-u_{h_k}^T v_{i_t})) \\\\
+$$
+现在，训练中每一步的梯度计算开销不再与词典大小相关，而与KK线性相关。当KK取较小的常数时，负采样在每一步的梯度计算开销较小。
 
-In the above formulation, {$\widetilde u_k$|k=1~K} are sampled from P(w). 
-
-
-
-极大化正样本出现的概率，极小化负样本出现的概率。用sigmoid代替了softmax，相当于进行正负样本的二分类。
+我们的目标实质是极大化正样本出现的概率，极小化负样本出现的概率。用sigmoid代替了softmax，相当于进行正负样本的二分类。
 
 $E = -log \sigma(v'_{w_{pos}}h) - \sum_{w_j \in W_{neg}} log \sigma(-v'_{w_j}h)$
 
@@ -265,6 +277,33 @@ $E = -log \sigma(v'_{w_{pos}}h) - \sum_{w_j \in W_{neg}} log \sigma(-v'_{w_j}h)$
 $v_{w_j}^{'(t+1)} = v_{w_j}^{'(t)} - \eta (\sigma(v_{w_j}^{'(t)T}h)-t_j)h$
 
 #### with CBOW
+
+### 代码实现
+
+我们使用负采样来进行近似训练。对于一对中心词和背景词，我们随机采样 K 个噪声词(K=5)。
+
+```python
+def get_negatives(all_contexts, sampling_weights, K):
+    all_negatives, neg_candidates, i = [], [], 0
+    population = list(range(len(sampling_weights)))
+    for contexts in all_contexts:
+        negatives = []
+        while len(negatives) < len(contexts) * K:
+            if i == len(neg_candidates):
+                # 根据每个词的权重sampling_weights随机生成k个词的索引作为噪声词。
+                # 为了高效计算，可以将k设得稍大一点
+                i, neg_candidates = 0, random.choices(
+                    population, sampling_weights, k=int(1e5))
+            neg, i = neg_candidates[i], i + 1
+            # 噪声词不能是背景词
+            if neg not in set(contexts):
+                negatives.append(neg)
+        all_negatives.append(negatives)
+    return all_negatives
+
+sampling_weights = [counter[w]**0.75 for w in idx_to_token]
+all_negatives = get_negatives(all_contexts, sampling_weights, 5)
+```
 
 
 
