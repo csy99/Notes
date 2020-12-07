@@ -206,7 +206,7 @@ $X$, $Y$相互独立<=>$p(x, y) = p(x)p(y) \ \forall \ x \in \mathcal X, y \in \
 
 $F(x,y) = P(X \le x, Y \le y) \ \forall \ x \in R, y \in R$
 
-容易得到$P(a < X \le x, b < Y \le y) = F(b,d) - F(a,d) - F(b,c) + F(a,c)$。
+容易得到$P(a < X \le b, c < Y \le d) = F(b,d) - F(a,d) - F(b,c) + F(a,c)$。
 
 **性质**
 
@@ -664,40 +664,6 @@ $P(\hat y \ne y) = p(y=0)P(\hat y = 1|y=0) + p(y=1)P(\hat y = 0|y=1)$
 
 
 
-# 逻辑回归
-
-逻辑回归(Logistic Regression)是判别式模型，不需要学习x的分布。
-$$
-\theta_i = \frac 1 {1 + e^{-x_i^Tw}}
-$$
-$\theta_i$是$y_i$为1的概率。当$x^T w = 0$时概率为0.5，正好是决策边界。
-
-为了计算的方便，我们令分类的标记为-1和1(而不是0和1)。我们仍然假设每一个数据点是相互独立的。运用MLE可以得到，
-$$
-p_w(y_1, ..., y_n) = \prod_i \theta^{I\{y_i=1\}} (1-\theta)^{I\{y_i = -1\}}
-$$
-对于目标函数，
-$$
-w^* = argmax_w -\sum_i log(1 + e^{-y_ix_i^Tw}) \\\\
-= argmin_w \sum_i log(1 + e^{-y_ix_i^Tw})
-$$
-可以看到，如果$x^Tw$和$y$的符号相同，说明预测准确，那么损失将非常接近于0。
-
-目标函数是一个凸函数，所以局部最优就是全局最优。
-
-我们可以通过证明Hessian是半正定，从而证明该函数是凸函数。亦可以通过另一些凸函数的性质证明。
-$$
-\frac {d^2} {dz^2} log(1 + e^{-z}) = \frac {e^z} {(e^z+1)^2}
-$$
-上面证明了一维成立。同时，我们知道线性变换是保留凸函数性的，并且非负的凸函数之和也为凸函数。得证，该函数是凸函数。
-
-最后，给出一个SGD的结论。
-$$
-\nabla_w f(w) = \sum_i \frac {-y_i} {1 + e^{y_i w^T x_i}} x_i
-$$
-
-
-
 # 潜变量模型
 
 目标是通过无标签的训练数据学习$p(x)$。既然是非监督学习，我们对$p(x)$更感兴趣，而不是$p(x,y)$。假设$z$是潜在变量，$p(x) = \int p(x,z) dz$。例如，在MNIST中$z$就是数字（不过在此处是无标签的）。在$z$是离散的情况下，可以由混合模型来解释。
@@ -712,11 +678,33 @@ $$
 
 # 高斯混合模型
 
-即Gaussian Mixture Models (GMM)。这是潜变量模型的一种，是最常见的形式之一。$z$代表该数据点是由某一个高斯分布产生的。
+混合模型是潜变量模型的一种，是最常见的形式之一。而高斯混合模型(Gaussian Mixture Models, GMM)是混合模型中最常见的一种。$z$代表该数据点是由某一个高斯分布产生的。$\pi$在这里是指该点属于哪一个高斯分布的先验概率。除次之外，我们还需要找到每一个高斯分布的参数，即均值和协方差矩阵。
 
-$p(x) = \sum_{k=1}^K \pi_k \mathcal N(x| \mu_k, \Sigma_k)$
+$$
+p(x) = \sum_{k=1}^K \pi_k p_k(x) \qquad \qquad (1)\\\\
+p(x) = \sum_{k=1}^K \pi_k \mathcal N(x| \mu_k, \Sigma_k) \qquad (2)
+$$
+我们对混合模型的一般形式即(1)进行拓展，已知每一种分布单独的期望和协方差矩阵，求出$x$的期望和协方差矩阵。
+$$
+E[x] = \sum_x x p(x) \\\\
+= \sum_x x \sum_k \pi_k p_k(x) \\\\
+= \sum_k \pi_k \sum_x x p_k(x)\\\\
+= \sum_k \pi_k E[p_k(x)] \\\\
+= \sum_k \pi_k \mu_k
+$$
 
-$\pi$在这里是指该点属于哪一个高斯分布的先验概率。除次之外，我们还需要找到每一个高斯分布的参数，即均值和协方差矩阵。下面介绍KMeans和EM两种方法。
+$$
+\Sigma_x = E[x^2] - (E[x])^2 \\\\
+= E[xx^T] - (\sum_k \pi_k \mu_k)^2 \\\\
+= \int xx^T p(x) dx - (\sum_k \pi_k \mu_k)^2 \\\\
+= \int xx^T \sum_k \pi_k p_k(x|k) dx - (\sum_k \pi_k \mu_k)^2 \\\\
+= \sum_k \pi_k \int xx^T p_k(x|k) dx - (\sum_k \pi_k \mu_k)^2 \\\\
+= \sum_k \pi_k E[xx^T|k] - (\sum_k \pi_k \mu_k)^2 \\\\
+= \sum_k \pi_k (E[xx^T|k] - \mu_k\mu_k^T + \mu_k\mu_k^T) - (\sum_k \pi_k \mu_k)^2 \\\\
+= \sum_k \pi_k (\Sigma_k + \mu_k\mu_k^T) - (\sum_k \pi_k \mu_k)^2 \\\\
+$$
+
+下面介绍KMeans和EM两种方法。
 
 ## K-平均演算法
 
@@ -761,7 +749,7 @@ $$
 \pi_k = \frac 1 N \sum_i r_{i,k}
 $$
 
-<img src="https://i.postimg.cc/GpPx3k2g/EM-1.png" height=400>
+<img src="https://i.postimg.cc/GpPx3k2g/EM-1.png" height=300>
 
 ### 目标函数
 
@@ -972,7 +960,7 @@ D(p||q) = \sum p(x) log \frac {p(x)} {q(x)} \\\\
 = log(|\mathcal X|) - H(X) \\\\
 \ge 0
 $$
-我们通过上面的推导也同样得出了熵的第二个性质。
+我们通过上面的推导也同样得出了熵的第二个性质。最后一行可以取等号当前仅当$p(x) = \frac 1 {|\mathcal X|}$。
 
 ### 法诺不等式
 
@@ -1000,6 +988,185 @@ H(E,Y|\hat Y) = H(E|\hat Y) + H(Y|E,\hat Y) \\\\
 \le 1 + P(\hat Y \ne Y)H(Y) \\\\
 \le 1 + P(\hat Y \ne Y)log(|\mathcal Y|)
 $$
+
+### 应用
+
+两个多变量正态分布的K-L散度求解如下。
+$$
+D(p(x) || q(x)) \\\\
+= \int p(x)[\frac 1 2 log(\frac{|\Sigma_2|} {|\Sigma_1|}) + \frac{1} {2}(x-\mu_2)^T\Sigma_2^{-1}(x-\mu_2) - \frac{1} {2}(x-\mu_1)^T\Sigma_1^{-1}(x-\mu_1)] dx \\\\
+= \frac 1 2 log(\frac{|\Sigma_2|} {|\Sigma_1|}) + \frac{1} {2}E_p[(x-\mu_2)^T\Sigma_2^{-1}(x-\mu_2)] - \frac{1} {2}E_p[(x-\mu_1)^T\Sigma_1^{-1}(x-\mu_1)]\\\\
+= \frac 1 2 log(\frac{|\Sigma_2|} {|\Sigma_1|}) + \frac{1} {2}E_p[tr((x-\mu_2)^T\Sigma_2^{-1}(x-\mu_2))] - \frac{1} {2}E_p[tr((x-\mu_1)^T\Sigma_1^{-1}(x-\mu_1))]\\\\
+= \frac 1 2 log(\frac{|\Sigma_2|} {|\Sigma_1|}) + \frac{1} {2}tr(\Sigma_2^{-1}E_p[(x-\mu_2)(x-\mu_2)^T]) - \frac{1} {2}tr(\Sigma_1^{-1}E_p[(x-\mu_1)(x-\mu_1)^T]) \\\\
+= \frac 1 2 log(\frac{|\Sigma_2|} {|\Sigma_1|}) + \frac{1} {2}tr(\Sigma_2^{-1}E_p[(xx^T-2x\mu_2^T+\mu_2^T\mu_2)]) - \frac{1} {2}tr(\Sigma_1^{-1}\Sigma_1) \\\\
+= \frac 1 2 log(\frac{|\Sigma_2|} {|\Sigma_1|}) + \frac{1} {2}tr(\Sigma_2^{-1}(E_p[xx^T]-E_p[2x\mu_2^T]+E_p[\mu_2^T\mu_2]))-\frac{n} {2} \\\\
+= \frac 1 2 log(\frac{|\Sigma_2|} {|\Sigma_1|}) + \frac{1} {2}tr(\Sigma_2^{-1}(\Sigma_1+\mu_1^T\mu_1-2\mu_1\mu_2^T+\mu_2^T\mu_2)) - \frac{n} {2} \\\\
+= \frac 1 2 log(\frac{|\Sigma_2|} {|\Sigma_1|}) + \frac{1} {2}tr(\Sigma_2^{-1}\Sigma_1) + (\mu_1-\mu_2)^T\Sigma_2^{-1}(\mu_1-\mu_2) - \frac{n} {2} \\\\
+$$
+过程有点长，每一个步骤的依据如下
+
+1. 将数字代入，对数和指数相抵消
+2. 概率之和为1，期望的定义
+3. 一个标量的迹就是它本身
+4. 矩阵迹数的循环排列定律
+5. 协方差矩阵的定义
+6. 拆括号，$tr(I) = n $
+7. 协方差矩阵的定义
+8. 矩阵乘积的迹数
+
+
+
+# 逻辑回归
+
+逻辑回归(Logistic Regression)是判别式模型，不需要学习$x$的分布。
+
+### 与熵的关系
+
+#### 信息熵
+
+计算对iid随机变量进行编码所需要的最少bits。
+$$
+H(p) = \sum_i p_i log(\frac{1} {p_i})
+$$
+
+#### 交叉熵
+
+计算使用对$q$最优化的编码方式将iid随机变量$p$进行编码所需要的最少bits。
+
+$$
+H(p,q) = \sum_i p_i log(\frac{1} {q_i})
+$$
+
+如果对于某些$i$有$q_i \ll p_i$，那么$H(p,q)$会很大。
+
+#### K-L散度
+
+$$
+D(p||q) = \sum_i p_i log(\frac{p_i} {q_i})
+$$
+
+除了将损失函数定义为交叉熵，我们亦可以定义其为K-L散度$l(y_i, \hat y_i) = D(y_i || \hat y_i)$。
+
+#### 三者关系
+
+$$
+H(p,q) = H(p) +D(p||q)
+$$
+
+### 二分类逻辑回归
+
+$$
+\theta_i = \frac 1 {1 + e^{-x_i^Tw}}
+$$
+
+$\theta_i$是$y_i$为1的概率。$x^T w$代表到决策边界的距离（带有符号的距离）。当这个距离为0时，正好是决策边界，标记为1的概率为0.5。上面的$\sigma$公式就是将该点与决策边界的距离转化成为分类概率。
+
+为了计算的方便，我们令分类的标记为-1和1(而不是0和1)。当$y_i$标记为-1时，我们令$p_i=[0 \quad 1]^T$；当$y_i$标记为1时，我们令$p_i=[1 \quad 0]^T$。
+
+我们仍然假设每一个数据点是相互独立的。运用MLE可以得到，
+$$
+p_w(y_1, ..., y_n) = \prod_i \theta^{I\{y_i=1\}} (1-\theta)^{I\{y_i = -1\}}
+$$
+取对数有
+$$
+log L(w) = \sum_i I\{y_i=1\}\ log(\theta) + I\{y_i = -1\}\ log(1-\theta) \\\\
+= -\sum_i H(p_i, q_i)
+$$
+我们将上式转化成为负对数损失(negative log loss, nll)。而且，由于$p_i$是第$i$条数据的标签（独热编码），它的信息熵是0。
+$$
+nll(w) = \sum_i H(p_i, q_i) \\\\
+= \sum_i H(p_i) + D(p_i || q_i) \\\\
+= \sum_i D(p_i || q_i)
+$$
+实质上，我们的目标就是最小化交叉熵。
+$$
+w^* = argmax_w -\sum_i log(1 + e^{-y_ix_i^Tw}) \\\\
+= argmin_w \sum_i log(1 + e^{-y_ix_i^Tw})
+$$
+可以看到，如果$x^Tw$和$y$的符号相同，说明预测准确，那么损失将非常接近于0。
+
+目标函数是一个凸函数，所以局部最优就是全局最优。
+
+我们可以通过证明Hessian是半正定，从而证明该函数是凸函数。亦可以通过另一些凸函数的性质证明。
+$$
+\frac {d^2} {dz^2} log(1 + e^{-z}) = \frac {e^z} {(e^z+1)^2}
+$$
+上面证明了一维成立。同时，我们知道线性变换是保留凸函数性的，并且非负的凸函数之和也为凸函数。得证，该函数是凸函数。
+
+最后，给出一个SGD的结论。
+$$
+\nabla_w f(w) = \sum_i \frac {-y_i} {1 + e^{y_i w^T x_i}} x_i
+$$
+
+### 多分类逻辑回归
+
+对二分类进行延伸，当$y_i$标记为c时，我们令$p_i$等于在c位置为1的独热编码。
+$$
+\theta_{i,c} = P(y=c|x_i) = \frac{exp(x_i^Tw_c)} {\sum_{c'=1}^C exp(x_i^Tw_{c'})} \\\\
+\hat y = argmax_y P(y|x)
+$$
+
+假设我们想比较数据点更有可能两类中哪一类。
+$$
+ \frac{P(y=c_1|x_i)} {P(y=c_2|x_i)} 
+ = \frac{exp(x_i^Tw_{c_1})} {exp(x_i^Tw_{c_2})} = 1 \\\\
+ x_i^T (w_{c_1} - w_{c_2}) = 0
+$$
+假设iid。
+$$
+p_w(y_1, ..., y_n) = \prod_{i=1}^n \prod_{c=1}^C \theta_{i,c}^{I\{y_i=c\}}
+$$
+我们对其取对数
+$$
+log(p_w) = -\sum_i H(p_i, q_i) \\\\
+= \sum_{i=1}^n \sum_{c=1}^C I\{y_i=c\} log(\frac{exp(x_i^Tw_c)} {\sum_{c'=1}^C exp(x_i^Tw_{c'})}) \\\\
+= \sum_{i=1}^n \sum_{c=1}^C I\{y_i=c\}[x_i^Tw_c -log(\sum_{c'=1}^C exp(x_i^Tw_{c'}))] \\\\
+= \sum_{i=1}^n [x_i^Tw_{y_i} - log(\sum_{c'=1}^C exp(x_i^Tw_{c'}))] \\\\
+$$
+这个函数没有解析解，只能使用梯度下降找到最值。
+$$
+\nabla_{w_c} f(w) = \sum_i (I\{y_i=c\} - \frac{exp(x_i^Tw_c)} {\sum_{c'=1}^C exp(x_i^Tw_{c'})}) x_i
+$$
+
+### 思路延伸
+
+我们可以从另一个角度来理解。二分类逻辑回归相当于一个神经元，而多分类逻辑回归相当于神经网络中一层神经元，只不过激活函数是sigmoid函数。当多层神经元进行叠加，我们的目标函数不一定是凸函数了。不过，我们的决策边界也从线性边界拓宽到非线性边界。那么我们可以将这个神经网络用于回归问题。
+
+
+
+# 神经网络
+
+### 损失函数
+
+$$
+min_{W_1,W_2,...} \sum_i l(y_i, y_i) \\\\
+min_{W_1,W_2,...} \sum_i D(y_i||\phi(W_l^T...\phi(W_2^T\phi(W_1^Tx_i))...))\\\\
+$$
+
+此处的损失函数沿用了K-L散度而非交叉熵（见逻辑回归章节）。这已经不是凸优化问题了，我们只能使用SGD进行求解。
+
+### 训练过程
+
+如果我们的激活函数$\phi$是Sigmoid，那么
+$$
+\sigma(z) = \frac 1 {1+e^{-z}} \\\\
+\frac{d\sigma(z)}{dz} = \sigma(z)(1-\sigma(z))
+$$
+使用反向传播(backpropagation)计算梯度：向网络输入数据$x_i$，计算其相对于前一层网络权重的梯度。
+
+### 函数逼近
+
+英文是function approximation。
+
+#### 通用近似定理
+
+英文是universal approximation theorem。人工神经网络近似任意函数的能力。
+
+考虑一个单层NN类似$\hat y = f(x) = \phi(W_2^T\phi(W_1^Tx))$。对于该映射函数$f: R^d \rightarrow R^D$，一定存在一组权重$W_1, W_2$满足
+$$
+sup_x||y - f(x)|| \le \epsilon
+$$
+此处$\epsilon$是错误率，非负。$sup$代表上界，与$max$的区别是最大值必须在值域内（函数值必须可以取到max），但是$sup$可以不在值域内。当$max$存在的时候，两者相等。
 
 
 
@@ -1127,6 +1294,102 @@ $$
 
 可得|A_{\epsilon}^n| \ge (1-\epsilon) 2^{n(H(X)-\epsilon)}
 $$
+
+### 损失函数
+
+假设我们的激活函数是线性函数，我们的损失函数是MSE。中间产物的维度是$m$。
+$$
+\hat x = W_2^TW_1^Tx \\\\
+W_2^TW_1^T \approx I \\\\
+rank(W_2^TW_1^T) \le m < d
+$$
+我们现在计算它的损失。我们令$A = W_2^TW_1^T$。
+$$
+min_{W_1, W_2} \sum_i l(x_i, \hat x_i) \\\\
+= min_{W_1, W_2} \sum_i ||x_i - W_2^TW_1^Tx_i||_2^2 \\\\
+= min_{W_1, W_2} ||X - W_2^TW_1^TX||_2^2 \\\\
+= min_{A:rank(A)\le m} ||X - AX||_F^2
+$$
+
+### 应用
+
+自编码器的应用体现在mp3和jpeg形式上，而gzip利用的是霍夫曼编码(Huffman coding)。
+
+可以用于去除噪音、数据可视化、流形学习(manifold learning)等领域。
+
+
+
+
+
+# 变分自动编码器
+
+是自编码器的升级版，目标是构建一个从隐变量$Z$生成目标数据$X$的模型。我们需要假设$Z$服从某种分布，最常见的就是正态分布（也有假设服从均匀分布的）。接下来，我们只需要保证模型能够学习到分布的参数即可。这个就是变分自动编码器和自动编码器的最主要的区别，变分自动编码器只学习参数，而自动编码器学习代表数据的函数。
+
+我们以MNIST数据集为例展示过程如下。
+
+<img src="https://i.postimg.cc/Y0VzxYx3/VAE.png" height=200>
+
+我们延续之前自编码器的符号标记，用$f$代表编码器部分的函数，用$g$代表解码器部分的函数。这两个函数之间有点类似互为反函数的关系。我们的目标就是使得$\hat x \approx x$，需要令$p(z) \sim \mathcal N(0,I)$。后一个要求是为了计算简便，方便根据学习到的参数进行抽样。
+
+我们再来复习一下隐变量模型。该模型的目的是从数据集$D = \{(x_i)\}^n$中学习$x$的分布$p(x)$。其中$Z$是隐变量，有可能有具体的意义，也有可能只是为了计算的方便。
+$$
+p(x) = \sum_z p(x,z) = \sum_z p(z) p(x|z) \\\\
+p(x) = \int p(x,z) dz = \int p(z) p(x|z) dz
+$$
+在MNIST数据集中，$Z$是预期数字。
+
+我们先考虑$Z$是离散变量的情况，即预测$x$分布的模型是混合模型。
+$$
+p(x) = \sum_{k=1}^K p(Z=k) \mathcal N(x|\mu_k, \Sigma_k)
+$$
+我们希望学习到$x$和$z$之间的关系，也就是后验概率。
+$$
+p(z|x) = \frac{p(x,z)} {p(x)} = \frac{p(x|z)p(z)} {p(x)} = \frac{p(x|z)p(z)} {\sum_z p(x|z)}
+$$
+例如，在之前介绍的高斯混合模型使用EM算法，我们知道
+$$
+p(z|x) = r_{i,k} = \frac{\pi_k \mathcal N(x| \mu_k, \Sigma_k)} {\sum_{k'} \pi_k' \mathcal N(x| \mu_k', \Sigma_k')}
+$$
+变分推理(variational inference)：我们希望通过另一个分布$q(z|x)$来估计$p(z|x)$。我们将$q(z|x)$限制成容易处理的形式，例如正态分布$\mathcal N(\mu(x), \Sigma(x))$。我们用K-L散度来计算两个分布之间的相似程度。为了书写简便，我们将$q(z|x)$简写成$q(z)$。
+$$
+D(q(z) || p(z|x)) = \int q(z)log \frac{q(z)} {p(z|x)} dz \\\\
+= \int q(z)log \frac{q(z)p(x)} {p(x,z)} dz \\\\
+= \int q(z) [log \frac{q(z)} {p(x,z)} + log(p(x))] dz \\\\
+= \int q(z) log \frac{q(z)} {p(x,z)} dz + \int q(z) log(p(x)) dz \\\\
+= \int q(z) log \frac{q(z)} {p(x,z)} dz + log(p(x))
+$$
+我们知道K-L散度具有非负性，所以我们可以改写上式成下面形式。
+$$
+log(p(x)) \ge \int q(z) log \frac{p(x,z)}{q(z)} dz \\\\
+= \int q(z) log \frac{p(x|z)p(z)}{q(z)} dz \\\\
+= \int q(z) log(p(x|z)) dz + \int q(z) log \frac{p(z)}{q(z)} dz \\\\
+= E_{Z \sim q(z)}[log(p(x|z))] - D(q(z)||p(z))
+$$
+我们的目标是最大化$p(x)$，实际上就等同于最大化下界中的期望，最小化下界中的K-L散度。我们之前求解过类似的K-L散度。
+$$
+D(p(x) || q(x)) = \frac 1 2 log(\frac{|\Sigma_2|} {|\Sigma_1|}) + \frac{1} {2}tr(\Sigma_2^{-1}\Sigma_1) + (\mu_1-\mu_2)^T\Sigma_2^{-1}(\mu_1-\mu_2) - \frac{n} {2} \\\\
+$$
+这里，我们将$p(z) \sim \mathcal N(0,I)$和$q(z) \sim \mathcal N(\mu(x),\Sigma(x))$代入。
+$$
+\frac 1 2 log(\frac{1} {|\Sigma_1|}) + \frac{1} {2}tr(\Sigma_1(x)) + (\mu(x))^2 - \frac{n} {2} \\\\
+$$
+接下来我们要计算目标函数前面的部分。
+$$
+E_{Z \sim q(z)}[log(p(x|z))] \approx \frac 1 n \sum log(p(x_i|z))
+$$
+其中$g$是确定性函数，所有的不确定性都来自根据分布的参数进行抽样。所以，如果我们知道了$z$，我们就知道了$\hat x$，反之亦然。再用那张图复习一遍。
+
+<img src="https://i.postimg.cc/g2KSpZZK/VAE2.png" height=100>
+$$
+log p(x_i|z) = log p(x_i|\hat x_i)
+$$
+我们想要最大化这个期望，那么就需要使$\hat x$和$x$尽可能接近。在损失函数的选择上，平方误差函数(squared error loss)可以帮我们最大化。这里直接给出损失函数公式。
+$$
+l(x,\hat x) = ||x -\hat x||^2 + D(\mathcal N(\mu, \Sigma)||\mathcal N(0,I))
+$$
+
+
+
 
 
 
