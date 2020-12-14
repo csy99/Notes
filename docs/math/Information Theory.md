@@ -640,12 +640,14 @@ $$
 L(\mu, \Sigma) = \frac {p(y=0) f(x|y=0)} {p(y=1) f(x|y=1)} \\\\
 = [\frac {p_0} {\sqrt{(2\pi)^{n} |\Sigma_0|}} * e^{-\frac {(x-\mu_0)^T\Sigma_0^{-1}(x-\mu_0)} { 2}}] / [\frac {p_1} {\sqrt{(2\pi)^{n} |\Sigma_1|}} * e^{-\frac {(x-\mu_1)^T\Sigma_1^{-1}(x-\mu_1)} { 2}}] \\\\
 = [\frac {p_0} {\sqrt{|\Sigma_0|}} * e^{-\frac {(x-\mu_0)^T\Sigma_0^{-1}(x-\mu_0)} { 2}}] / [\frac {p_1} {\sqrt{ |\Sigma_1|}} * e^{-\frac {(x-\mu_1)^T\Sigma_1^{-1}(x-\mu_1)} { 2}}] \\\\
+$$
 
+通过求对数进行简化。
+$$
 log(L(\mu, \Sigma)) = \\\\
 log(\frac{p_0} {\sqrt{|\Sigma_0|}}) - log(\frac{p_1} {\sqrt{|\Sigma_1|}}) + \frac{1} {2} [(x-\mu_1)^T\Sigma_1^{-1}(x-\mu_1) - (x-\mu_0)^T\Sigma_0^{-1}(x-\mu_0)] \\\\
 = \frac 1 2 log(\frac{p_0^2} {|\Sigma_0|}) - \frac 1 2 log(\frac{p_1^2} {|\Sigma_1|}) + \frac{1} {2} [(x-\mu_1)^T\Sigma_1^{-1}(x-\mu_1) - (x-\mu_0)^T\Sigma_0^{-1}(x-\mu_0)] \\\\
 $$
-
 经过推导，我们发现不平衡的类别先验概率只是影响了常数项。
 $$
 B = \Sigma_1^{-1} - \Sigma_0^{-1} \\\\
@@ -769,42 +771,9 @@ M-step: 对于$z_i$求出$\theta_t$的最大似然
 
 实际情况下，我们有可能不知道$X_i$的真实分布。有一些定理可以帮助我们大致确定我们的估计有多少偏差。
 
-### 样本复杂度
-
-英文是sample complexity。为了达到错误率小于等于$\epsilon$的概率大于或等于$1 - \delta$所需要的样本数量。
-
-定理1（上界）：我们找到了一个算法能够在小于$n(\delta, \epsilon)$个样本数量的前提下达到错误率小于等于$\epsilon$的概率大于或等于$1 - \delta$。
-
-定理2（下界）：我们目前已经测试的所有算法达到错误率小于等于$\epsilon$的概率大于或等于$1 - \delta$都需要大于$n(\delta, \epsilon)$个样本数量。
-
-真正的样本数量就是介于下界(lower limit)和上界(upper limit)之间。
-
-拿多变量高斯分布举例。在iid的前提条件下，我们假设$X_i \sim \mathcal N(\mu, \sigma^2)$。我们对均值进行预测$\hat \mu = \frac 1 n \sum_i X_i$。那么得到的预测服从$\hat \mu \sim \mathcal N(\mu, \sigma^2/n)$。下面的推导假设$\mu = 0$。
-
-那么如何衡量这个预测？中间的第二步利用$y = \frac{x} {\sqrt{\sigma^2/n}}$进行了换元操作。
-$$
-P(|\hat \mu - \mu| \ge t) = 2 \int_t^{\infty} \frac {1} {\sqrt{2\pi\sigma^2/n}} exp(-\frac{x^2} {2\sigma^2/n}) dx\\\\
-= 2 \int_{t\sqrt{n/\sigma^2}}^{\infty} \frac {1} {\sqrt{2\pi}} exp(-\frac{y^2} {2}) dy\\\\
-= 2Q(t\sqrt{n/\sigma^2}) \le 2*exp(-t^2n/\sigma^2)
-$$
-这里的Q指的是Q函数，用于表示标准正态分布的尾部分布函数。有人也将此称为高斯尾(Gaussian tail)。
-$$
-Q(x) := \int_x^{\infty} \frac {1} {\sqrt{2\pi}} exp(-\frac{y^2} {2}) dy\\\\
-\le \int_x^{\infty} \frac {y} {x\sqrt{2\pi}} exp(-\frac{y^2} {2}) dy \\\\
-= \frac{exp(-x^2/2)} {x\sqrt{2\pi}} \\\\
-\le exp(-x^2/2) \ for \ x \ge \frac{1} {\sqrt{2\pi}}
-$$
-
-### 高斯尾边界
-
-英文是Gaussian tail bounds。令$X \sim \mathcal N(0,1)$。对于所有$t \ge 0$，
-$$
-P(X \ge t) \le e^{-t^2/2}
-$$
-
 ### 马尔科夫不等式
 
-英文是Markov inequality。假设$X$是一个非负随机变量(RV)，那么对于任何非负的实数$a$有$P(X \ge a) \le \frac {E[X]} a$。（$X \ge 0$，$t \ge 0$）
+英文是Markov inequality。假设$X$是一个非负随机变量(RV)，那么对于任何非负的实数$a$有$P(X \ge a) \le \frac {E[X]} a$。（$X \ge 0$，$a \ge 0$）
 $$
 a*\mathbb{I}_{\{X \ge a\}} \le X \\\\
 E[a*\mathbb{I}_{\{X \ge a\}}] \le E[X] \\\\
@@ -829,9 +798,42 @@ P(|\hat \mu - \mu| \ge \delta) = P((\hat \mu - \mu)^2 \ge (\delta)^2) \\\\
 = \frac {\sigma^2} {n\delta^2}
 $$
 
+### 样本复杂度
+
+英文是sample complexity。为了达到错误率小于等于$\epsilon$的概率大于或等于$1 - \delta$所需要的样本数量。
+
+定理1（上界）：我们找到了一个算法能够在小于$n(\delta, \epsilon)$个样本数量的前提下达到错误率小于等于$\epsilon$的概率大于或等于$1 - \delta$。
+
+定理2（下界）：我们目前已经测试的所有算法达到错误率小于等于$\epsilon$的概率大于或等于$1 - \delta$都需要大于$n(\delta, \epsilon)$个样本数量。
+
+真正需要的样本数量就是介于下界(lower limit)和上界(upper limit)之间。
+
+拿多变量高斯分布举例。在iid的前提条件下，我们假设$X_i \sim \mathcal N(\mu, \sigma^2)$。我们对均值进行预测$\hat \mu = \frac 1 n \sum_i X_i$。那么得到的预测服从$\hat \mu \sim \mathcal N(\mu, \sigma^2/n)$。下面的推导假设$\mu = 0$。
+
+那么如何衡量这个预测？中间的第二步利用$y = \frac{x} {\sqrt{\sigma^2/n}}$进行了换元操作。
+$$
+P(|\hat \mu - \mu| \ge t) = 2 \int_t^{\infty} \frac {1} {\sqrt{2\pi\sigma^2/n}} exp(-\frac{x^2} {2\sigma^2/n}) dx\\\\
+= 2 \int_{t\sqrt{n/\sigma^2}}^{\infty} \frac {1} {\sqrt{2\pi}} exp(-\frac{y^2} {2}) dy\\\\
+= 2Q(t\sqrt{n/\sigma^2}) \le 2*exp(-t^2n/2\sigma^2)
+$$
+这里的Q指的是Q函数，用于表示标准正态分布的尾部分布函数。有人也将此称为高斯尾(Gaussian tail)。
+$$
+Q(x) := \int_x^{\infty} \frac {1} {\sqrt{2\pi}} exp(-\frac{y^2} {2}) dy\\\\
+\le \int_x^{\infty} \frac {y} {x\sqrt{2\pi}} exp(-\frac{y^2} {2}) dy \\\\
+= \frac{exp(-x^2/2)} {x\sqrt{2\pi}} \\\\
+\le exp(-x^2/2) \ for \ x \ge \frac{1} {\sqrt{2\pi}}
+$$
+
+### 高斯尾边界
+
+英文是Gaussian tail bounds，就是上文提到的Q函数。令$X \sim \mathcal N(0,1)$。在这里，对$t$（也就是上文的$x$）拓宽了限制条件，具体可以使用Chernoff Bound（下文有介绍）。对于所有$t \ge 0$，
+$$
+P(X \ge t) \le e^{-t^2/2}
+$$
+
 ### 切尔诺夫界
 
-英文是Chernoff Bound。对于随机变量$X$和 实数$s \ge 0$，有
+英文是Chernoff Bound。对于随机变量$X$和实数$s \ge 0$，有
 $$
 P(X \ge t) \le e^{-st} E[e^{sX}]
 $$
@@ -845,20 +847,28 @@ $$
 
 <img src="https://i.postimg.cc/hGP61NFz/proof-chernoff-bound.png" height=150>
 
+我们来看看为什么上面高斯尾函数能够拓宽限制条件。求期望需要用到矩生成函数(Moment-generating function)。
+$$
+P(X \ge t) \le  e^{-st}E[e^{sX}] \\\\
+= e^{-st}e^{s^2/2} \\\\
+\le e^{-t^2/2}
+$$
+最后一行我们令$s =t$。
+
 ### 霍夫丁不等式
 
-英文是Hoeffding's Inequality。假设$X_i$都是iid的随机变量且$X_i \in [a,b]$。$\hat \mu = \frac 1 n \sum_i X_i$，并且$\mu = E[X_i]$。
+英文是Hoeffding's Inequality。假设$X_i$都是iid的随机变量且$X_i \in [a,b]$。$\hat \mu = \frac 1 n \sum_i X_i$，并且$\mu = E[X_i]$。可以通过Chernoff Bound进行推导(选择一个合适的$s$)。
 $$
 P(|\hat \mu - \mu| \ge t) \le 2*exp(-\frac{2t^2n} {(b-a)^2})
 $$
-如果$X_i \sim \mathcal N(\mu, \sigma^2)$，那么
+假设iid且$X_i \sim \mathcal N(\mu, \sigma^2)$，那么
 $$
 P(|\hat \mu - \mu| \ge t) \le 2*exp(-\frac{t^2n} {\sigma^2})
 $$
 
 ### 大数定律
 
-英文是Law of Large Numbers (LLN)，也被称作大数法则。根据这个定律知道，样本数量越多，则其算术平均值就有越高的概率接近期望值。当然，期望不能是发散的。
+英文是Law of Large Numbers (LLN)，也被称作大数法则。根据这个定律知道，样本数量越多，则其算术平均值就有越高的概率接近期望值。当然，期望本身不能是发散的。
 
 我们先介绍弱形式。即假设$X_i$都是iid的随机变量，那么从概率的角度$\frac 1 n \sum_i X_i$会逐渐收敛到$E[X_i]$。
 
@@ -886,7 +896,7 @@ $$
 
 # K-L散度
 
-我们使用Kullback-Leibler Divergence来衡量两个分布$p$和$q$究竟有多相似。对数函数的底不是很重要，只要在计算时保持一致即可。如果是以$e$为底，那么单位是nats；如果是以2为底，那么单位是bits。需要注意的是，需要对所有$x$满足$q(x) \ne 0$，否则K-L散度不存在。另外，K-L散度不是距离，并不具有对称性。
+我们使用Kullback-Leibler Divergence来衡量两个分布$p$和$q$究竟有多相似。对数函数的底不是很重要，只要在计算时保持一致即可。如果是以$e$为底，那么单位是nats；如果是以2为底，那么单位是bits。需要注意的是，需要对所有$x$满足$q(x) \ne 0$，否则K-L散度不存在。另外，K-L散度不是距离，并不具有对称性(symmetric)。
 $$
 D(p||q) = \sum p(x) log \frac {p(x)} {q(x)} \\\\
 D(p||q) = \int p(x) log \frac {p(x)} {q(x)} dx
@@ -903,7 +913,7 @@ $$
 
 1. 非负性，当且仅当对于所有$x$有$p(x) = q(x)$的时候，散度为0
 
-对于性质1，我们可以进行证明。
+对于性质1的非负性，我们有如下证明。
 $$
 -D(p||q) = -\sum p(x) log \frac {p(x)} {q(x)} \\\\
 = \sum p(x) log \frac {q(x)} {p(x)} \\\\
@@ -922,7 +932,7 @@ $$
 
 误差指数的计算如下
 $$
-lim_{n->\infty} \frac {-ln P_{error}} {n} = -D(p||q)
+lim_{n->\infty} \frac {-ln P_{error}} {n} = D(p||q)
 $$
 
 ### 詹森不等式
@@ -970,13 +980,13 @@ $$
 
 假设我们有如上图所示的模型。
 $$
-P(\hat Y \ne Y) \ge \frac {H(Y|x) - 1} {log(|\mathcal Y|)}
+P(\hat Y \ne Y) \ge \frac {H(Y|X) - 1} {log(|\mathcal Y|)}
 $$
 我们将错误定义为$E = \mathcal I_{\{\hat Y \ne Y\}}$。证明如下。
 $$
 H(E,Y|\hat Y) = H(Y|\hat Y) + H(E|Y,\hat Y) \\\\
 = H(Y|\hat Y) \\\\
-\ge H(Y|x) \\\\
+\ge H(Y|X) \\\\
 $$
 我们将信息熵以另一种方式拆解。
 $$
@@ -1059,9 +1069,9 @@ $$
 \theta_i = \frac 1 {1 + e^{-x_i^Tw}}
 $$
 
-$\theta_i$是$y_i$为1的概率。$x^T w$代表到决策边界的距离（带有符号的距离）。当这个距离为0时，正好是决策边界，标记为1的概率为0.5。上面的$\sigma$公式就是将该点与决策边界的距离转化成为分类概率。
+$\theta_i$是$y_i$为1的概率。$x^T w$代表到决策边界的距离（带有符号的距离）。当这个距离为0时，正好是决策边界，标记为任何一类的概率都是0.5。上面的$\sigma$公式就是将该点与决策边界的距离转化成为分类概率。
 
-为了计算的方便，我们令分类的标记为-1和1(而不是0和1)。当$y_i$标记为-1时，我们令$p_i=[0 \quad 1]^T$；当$y_i$标记为1时，我们令$p_i=[1 \quad 0]^T$。
+为了计算的方便，我们令分类的标记为-1和1(而不是0和1)。当$y_i$标记为-1时，我们令$p_i=[1 \quad 0]^T$；当$y_i$标记为1时，我们令$p_i=[0 \quad 1]^T$；$q_i = [1-\theta_i \quad \theta_i]^T$。
 
 我们仍然假设每一个数据点是相互独立的。运用MLE可以得到，
 $$
@@ -1078,7 +1088,7 @@ nll(w) = \sum_i H(p_i, q_i) \\\\
 = \sum_i H(p_i) + D(p_i || q_i) \\\\
 = \sum_i D(p_i || q_i)
 $$
-实质上，我们的目标就是最小化交叉熵。
+实质上，我们的目标就是最小化逻辑损失函数(logistic loss)。
 $$
 w^* = argmax_w -\sum_i log(1 + e^{-y_ix_i^Tw}) \\\\
 = argmin_w \sum_i log(1 + e^{-y_ix_i^Tw})
@@ -1093,7 +1103,7 @@ $$
 $$
 上面证明了一维成立。同时，我们知道线性变换是保留凸函数性的，并且非负的凸函数之和也为凸函数。得证，该函数是凸函数。
 
-最后，给出一个SGD的结论。
+逻辑回归没有解析解(closed-form solution)。这里给出一个SGD的结论。
 $$
 \nabla_w f(w) = \sum_i \frac {-y_i} {1 + e^{y_i w^T x_i}} x_i
 $$
@@ -1202,7 +1212,7 @@ Shannon的信源编码定理(source coding theorem)是量化信息的基础。�
 
 我们假设encoder的输入$x \in \{0, 1\}^n$并将其映射到$y \in \{0, 1\}^m$。数据是$X \sim Bern(0.8)$。
 
-我们先看$n = 1000$的情况。假设我们自编码器的波动容纳是100，也就是说当$x$中包含少于700个1，或者多于800个1的时候自编码器会失效。我们下面计算自编码器失效的概率。
+我们先看$n = 1000$的情况。假设我们自编码器的波动容纳是100，也就是说当$x$中包含少于700个1，或者多于900个1的时候自编码器会失效。我们下面计算自编码器失效的概率。
 $$
 P(|k-n\theta| \ge t) \le 2*exp(-2t^2/n) \\\\
 P(|k-800| \ge 100) \le 2*exp(-2*100^2/1000) = 4.12*10^{-9} \\\\
@@ -1221,16 +1231,16 @@ $$
 
 改变出现在指数项是量级上的改变！
 
-我们再来看$n = 100,000$的情况。假设我们自编码器的波动容纳是1000，也就是说当$x$中包含少于700个1，或者多于800个1的时候自编码器会失效。我们下面计算自编码器失效的概率。
+我们再来看$n = 100,000$的情况。假设我们自编码器的波动容纳是1000，也就是说当$x$中包含少于79000个1，或者多于81000个1的时候自编码器会失效。我们下面计算自编码器失效的概率。
 $$
 P(|k-n\theta| \ge t) \le 2*exp(-2t^2/n) \\\\
-P(|k-800| \ge 100) \le 2*exp(-2*1000^2/100000) = 4.12*10^{-9} \\\\
+P(|k-80000| \ge 1000) \le 2*exp(-2*1000^2/100000) = 4.12*10^{-9} \\\\
 $$
 我们需要编码的序列范围是
 $$
 \sum_{k=79000}^{81000} C(100000, k) \le 2000*C(100000,79000) \approx 2^{74163}
 $$
-目前的压缩率是$74163/100k = 0.74163$。我们的信息熵是0.722 bits。已经非常接近了。
+目前的压缩率是$74163/100k = 0.74163$。序列的信息熵是0.722 bits。已经非常接近了。
 
 我们总结一下，当$n$足够大，始终保持自编码器的波动容纳是$t = c \sqrt n$，那么自编码器失效的概率是
 $$
@@ -1238,7 +1248,8 @@ P(|k-n\theta| \ge t) \le 2*exp(-2t^2/n) = 2*exp(-2c^2)
 $$
 我们需要编码的序列是
 $$
-\sum_{k=n\theta-t}^{n\theta+t} C(n, k) \approx 2t*C(n, n\theta) \\\\
+\sum_{k=n\theta-t}^{n\theta+t} C(n, k) \\\\
+\approx 2t*C(n, n\theta) \\\\
 \approx 2^{log_2(2t)} 2^{nH(X)}
 $$
 由此得知，压缩率大约是$H(X)$。
@@ -1264,10 +1275,16 @@ $$
 
 在信息论中，渐近均分性质(Asymptotic equipartition property, AEP)是随机源输出样本的一般性质。对于数据压缩理论中使用的典型集合的概念而言，这是基础。
 
-我们只关心熵典型集
+我们只关心熵典型集(entropy typical set)
 $$
 A_{\epsilon}^n = \{x:|\frac 1 n log(\frac 1 {p(x)}) - H(X)| \le \epsilon \}
 $$
+重写熵典型集的定义（将绝对值拆开），我们可以得到，在$x \in \mathcal X^n$时，如下不等式成立。
+$$
+2^{-n(H(X)+\epsilon)} \le p(x) \le 2^{-n(H(X)-\epsilon)}
+$$
+这个不等式在对性质的证明上很有帮助。
+
 **性质**
 
 对于$n$足够大时，
@@ -1283,17 +1300,17 @@ $$
 \ge \sum_{x \in A_{\epsilon}^n} p(x) \\\\
 \ge \sum_{x \in A_{\epsilon}^n} 2^{-n(H(X)+\epsilon)} \\\\
 = 2^{-n(H(X)+\epsilon)}|A_{\epsilon}^n| \\\\
-
-可得|A_{\epsilon}^n| \le 2^{n(H(X)+\epsilon)}
 $$
+可得$|A_{\epsilon}^n| \le 2^{n(H(X)+\epsilon)}$
+
 对于性质3，有如下证明
 $$
 1-\epsilon < P(x \in A_{\epsilon}^n) \\\\
 \le \sum_{x \in A_{\epsilon}^n} 2^{-n(H(X)-\epsilon)} \\\\
 = 2^{-n(H(X)-\epsilon)}|A_{\epsilon}^n| \\\\
-
-可得|A_{\epsilon}^n| \ge (1-\epsilon) 2^{n(H(X)-\epsilon)}
 $$
+
+可得$|A_{\epsilon}^n| \ge (1-\epsilon) 2^{n(H(X)-\epsilon)}$
 
 ### 损失函数
 
@@ -1316,8 +1333,6 @@ $$
 自编码器的应用体现在mp3和jpeg形式上，而gzip利用的是霍夫曼编码(Huffman coding)。
 
 可以用于去除噪音、数据可视化、流形学习(manifold learning)等领域。
-
-
 
 
 
@@ -1377,24 +1392,18 @@ $$
 $$
 E_{Z \sim q(z)}[log(p(x|z))] \approx \frac 1 n \sum log(p(x_i|z))
 $$
-其中$g$是确定性函数，所有的不确定性都来自根据分布的参数进行抽样。所以，如果我们知道了$z$，我们就知道了$\hat x$，反之亦然。再用那张图复习一遍。
-
-<img src="https://i.postimg.cc/g2KSpZZK/VAE2.png" height=100>
+其中$g$是确定性函数，所有的不确定性都来自根据分布的参数进行抽样。所以，如果我们知道了$z$，我们就知道了$\hat x$，反之亦然。
 $$
 log p(x_i|z) = log p(x_i|\hat x_i)
 $$
+再用那张图复习一遍。
+
+<img src="https://i.postimg.cc/g2KSpZZK/VAE2.png" height=100>
+
 我们想要最大化这个期望，那么就需要使$\hat x$和$x$尽可能接近。在损失函数的选择上，平方误差函数(squared error loss)可以帮我们最大化。这里直接给出损失函数公式。
 $$
 l(x,\hat x) = ||x -\hat x||^2 + D(\mathcal N(\mu, \Sigma)||\mathcal N(0,I))
 $$
-
-
-
-
-
-
-
-
 
 
 

@@ -187,5 +187,5 @@ $$
 # Reference
 
 - [Dive Into Deep Learning](http://zh.gluon.ai/chapter_recurrent-neural-networks/rnn.html)，第6章
-- [Natural Language Processing with Deep Learning (Stanford CS224N)](http://web.stanford.edu/class/cs224n/), 2019 winter
+- [Natural Language Processing with Deep Learning](http://web.stanford.edu/class/cs224n/), Stanford University, CS224N, 2019 winter
 

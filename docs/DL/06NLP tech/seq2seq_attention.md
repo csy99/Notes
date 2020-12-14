@@ -2,7 +2,7 @@
 
 序列到序列网络(Sequence to Sequence network)，也叫做seq2seq网络, 又或者是编码器解码器网络(Encoder Decoder network)， 是一个由两个称为编码器解码器的RNN组成的模型。在这里进行介绍的作用是确定变量的名称，为接下来讲注意力机制做铺垫。
 
-自编码器也是seq2seq模型中的一种。在自编码器中，解码器的工作是将编码器产生的向量还原成为原序列。经过压缩之后不可避免的会出现信息的损失，我们需要尽量将这种损失降低（方法是设置合理的中间向量大小和经过多次训练迭代的编码-解码器）。相关理论本身在这里讲得不是很清楚，有兴趣了解更多的同学可以移步数学专题中的[信息论]()。
+自编码器也是seq2seq模型中的一种。在自编码器中，解码器的工作是将编码器产生的向量还原成为原序列。经过压缩之后不可避免的会出现信息的损失，我们需要尽量将这种损失降低（方法是设置合理的中间向量大小和经过多次训练迭代的编码-解码器）。相关理论本身在这里讲得不是很清楚，有兴趣了解更多的同学可以移步数学专题中的[信息论](https://blog.csdn.net/qq_40136685/article/details/110849213)。
 
 ## 编码器
 
@@ -130,29 +130,6 @@ $$
 
 
 
-# 机器翻译
-
-## 统计机器翻译
-
-我们有原文$x$，我们希望将其翻译成另一种语言译文$y$。
-$$
-argmax_y P(y|x) \\\\
-= argmax_y P(x|y) P(y)
-$$
-公式前一部分$P(x|y)$是翻译模型，负责翻译词和词组。后一部分$P(y)$是
-
-为了训练出一个性能优秀的翻译模型，我们首先需要有很多的平行数据（从原文到译文）。
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -165,7 +142,5 @@ $$
 - [Dive Into Deep Learning](http://zh.gluon.ai/chapter_recurrent-neural-networks/rnn.html)，第10章
 
 - [Natural Language Processing with Deep Learning](http://web.stanford.edu/class/cs224n/index.html), Stanford CS244n, 2019 winter,  Chris Manning
-
-- [Attention Is All You Need](https://arxiv.org/abs/1706.03762), Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, Illia Polosukhin
 
   
