@@ -28,7 +28,7 @@ $$
 $$
 在每一步对学习率进行调整。
 $$
-g_t' = \frac{\eta v_t'}{\sqrt{\hat s_t} + \epsilon} \\\\
+g_t' = \frac{\eta \hat v_t}{\sqrt{\hat s_t} + \epsilon} \\\\
 x_t = x_{t-1} - g_t'
 $$
 

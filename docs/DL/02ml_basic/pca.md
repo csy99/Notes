@@ -78,10 +78,6 @@ $\hat X = \sum_{j=1}^d (X'^T u_j)u_j$
 
 
 
-
-
-
-
 # Reference
 
 - CS540 Intro to AI, UW Madison, Jerry Zhu
